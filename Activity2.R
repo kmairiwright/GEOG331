@@ -39,10 +39,13 @@ str(datW)
 
 #specify a column with a proper date format
 #note the format here dataframe$column
-datWdateF<-as.Date(datW$DATE, "%Y-%m-%d")
+#format without $ sign will create a value
+datW$dateF<-as.Date(datW$DATE, "%Y-%m-%d")
+
 #google date formatting in r to find more options and learn more
 
 #create a date column by reformatting the date to only include years
-# and indicating that it should be treated as numeric data
+#and indicating that it should be treated as numeric data
 datW$year<-as.numeric(format(datW$dateF, "%Y"))
+
 
