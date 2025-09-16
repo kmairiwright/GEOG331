@@ -31,3 +31,18 @@ Mat.bycol[1,]
 #look at all values in column 2
 Mat.bycol[,2]
 
+#dataframes
+#read in weather station file from your data folder
+datW<-read.csv("Z:\\kmwright\\data\\noaa_weather\\2011124.csv",stringsAsFactors=T)
+#get more information about the dataframe
+str(datW)
+
+#specify a column with a proper date format
+#note the format here dataframe$column
+datWdateF<-as.Date(datW$DATE, "%Y-%m-%d")
+#google date formatting in r to find more options and learn more
+
+#create a date column by reformatting the date to only include years
+# and indicating that it should be treated as numeric data
+datW$year<-as.numeric(format(datW$dateF, "%Y"))
+
