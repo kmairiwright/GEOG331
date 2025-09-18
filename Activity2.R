@@ -48,7 +48,8 @@ datW$dateF<-as.Date(datW$DATE, "%Y-%m-%d")
 #and indicating that it should be treated as numeric data
 datW$year<-as.numeric(format(datW$dateF, "%Y"))
 
-#Question 2, create example vector of each data type with 5 objects in it
+####Question 2####
+#create example vector of each data type with 5 objects in it
 #creating a vector of character data with 5 colors
 vector_character<-c("blue", "red","green","pink","yellow")
 #creating a vector of numeric data with 5 numbers
@@ -58,6 +59,211 @@ vector_integer<-c(10L,3L,4L,8L,1L)
 #creating a vector of factor data with 5 objects and 3 levels
 vector_factor<-factor(c("blue", "red", "green", "blue", "red"))
 
+#find out all unique site names
+unique(datW$NAME)
+#look at the mean maximum temperature for Aberdeen
+mean(datW$TMAX[datW$NAME == "ABERDEEN, WA US"])
+#look at the mean maximum temperature for Aberdeen
+#with na.rm argument set to true to ingnore NA
+mean(datW$TMAX[datW$NAME == "ABERDEEN, WA US"], na.rm=TRUE)                      
+#calculate the average daily temperature
+#This temperature will be halfway between the minimum and maximum temperature
+datW$TAVE <- datW$TMIN + ((datW$TMAX-datW$TMIN)/2)
+#get the mean across all sites
+#the by function is a list of one or more variables to index over.
+#FUN indicates the function we want to use
+#if you want to specify any function specific arguments use a comma and add them after the function
+#here we want to use the na.rm arguments specific to 
+averageTemp <- aggregate(datW$TAVE, by=list(datW$NAME), FUN="mean",na.rm=TRUE)
+averageTemp
+#change the automatic output of column names to be more meaningful
+#note that MAAT is a common abbreviation for Mean Annual Air Temperature
+colnames(averageTemp) <- c("NAME","MAAT")
+averageTemp
+
+#convert level to number for factor data type
+#you will have to reference the level output or look at the row of data to see the character designation.
+datW$siteN <- as.numeric(datW$NAME)
+
+#make a histogram for the first site in our levels
+#main= is the title name argument.
+#Here you want to paste the actual name of the factor not the numeric index
+#since that will be more meaningful. 
+####QUESTION 4#####
+#Add all histograms into the same window
+par(mfrow=c(2,2))
+hist(datW$TAVE[datW$siteN == 1],
+     freq=FALSE, 
+     main = paste(levels(datW$NAME)[1]),
+     xlab = "Average daily temperature (degrees C)", 
+     ylab="Relative frequency",
+     col="grey50",
+     border="white")
+#add mean line with red (tomato3) color
+#and thickness of 3
+abline(v = mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE), 
+       col = "tomato3",
+       lwd = 3)
+#add standard deviation line below the mean with red (tomato3) color
+#and thickness of 3
+abline(v = mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE) - sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE), 
+       col = "tomato3", 
+       lty = 3,
+       lwd = 3)
+#add standard deviation line above the mean with red (tomato3) color
+#and thickness of 3
+abline(v = mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE) + sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE), 
+       col = "tomato3", 
+       lty = 3,
+       lwd = 3)
+
+#making a histogram for three other sites
+#making a histogram for Livermore
+hist(datW$TAVE[datW$siteN == 2],
+     freq=FALSE,
+     main=paste(levels(datW$NAME)[2]),
+     xlab = "Average daily temperature (degrees C)", 
+     ylab="Relative frequency",
+     col="pink",
+     border="white")
+#mean line 
+abline(v = mean(datW$TAVE[datW$siteN == 2],na.rm=TRUE), 
+      col = "tomato3",
+      lwd = 3)
+#standard deviation below
+abline(v = mean(datW$TAVE[datW$siteN == 2],na.rm=TRUE) - sd(datW$TAVE[datW$siteN == 2],na.rm=TRUE), 
+       col = "tomato3", 
+       lty = 3,
+       lwd = 3)
+#standard deviation above
+abline(v = mean(datW$TAVE[datW$siteN == 2],na.rm=TRUE) + sd(datW$TAVE[datW$siteN == 2],na.rm=TRUE), 
+       col = "tomato3", 
+       lty = 3,
+       lwd = 3)
+
+#making a histogram for Mandan Experiment Station
+hist(datW$TAVE[datW$siteN == 3],
+     freq=FALSE,
+     main=paste(levels(datW$NAME)[3]),
+     xlab = "Average daily temperature (degrees C)", 
+     ylab="Relative frequency",
+     col="blue",
+     border="white")
+#mean line 
+abline(v = mean(datW$TAVE[datW$siteN == 3],na.rm=TRUE), 
+      col = "tomato3",
+      lwd = 3)
+#standard deviation below
+abline(v = mean(datW$TAVE[datW$siteN == 3],na.rm=TRUE) - sd(datW$TAVE[datW$siteN == 3],na.rm=TRUE), 
+      col = "tomato3", 
+      lty = 3,
+      lwd = 3)
+#standard deviation above
+abline(v = mean(datW$TAVE[datW$siteN == 3],na.rm=TRUE) + sd(datW$TAVE[datW$siteN == 3],na.rm=TRUE), 
+      col = "tomato3", 
+      lty = 3,
+      lwd = 3)
+     
+#making a histogram for Mormon Flat
+hist(datW$TAVE[datW$siteN == 4],
+      freq=FALSE,
+      main=paste(levels(datW$NAME)[4]),
+      xlab = "Average daily temperature (degrees C)", 
+      ylab="Relative frequency",
+      col="green",
+      border="white")
+#mean line 
+abline(v = mean(datW$TAVE[datW$siteN == 4],na.rm=TRUE), 
+      col = "tomato3",
+      lwd = 3)
+#standard deviation below
+abline(v = mean(datW$TAVE[datW$siteN == 4],na.rm=TRUE) - sd(datW$TAVE[datW$siteN == 4],na.rm=TRUE), 
+      col = "tomato3", 
+      lty = 3,
+      lwd = 3)
+#standard deviation above
+abline(v = mean(datW$TAVE[datW$siteN == 4],na.rm=TRUE) + sd(datW$TAVE[datW$siteN == 4],na.rm=TRUE), 
+      col = "tomato3", 
+      lty = 3,
+      lwd = 3)     
+
+#Question 3####
+#looking up arguments in histogram
+help(hist)
+help(paste)
+
+#note I've named the histogram so I can reference it later
+h1 <- hist(datW$TAVE[datW$siteN == 1],
+           freq=FALSE, 
+           main = paste(levels(datW$NAME)[1]),
+           xlab = "Average daily temperature (degrees C)", 
+           ylab="Relative frequency",
+           col="grey50",
+           border="white")
+#the seq function generates a sequence of numbers that we can use to plot the normal across the range of temperature values
+x.plot <- seq(-10,30, length.out = 100)
+#the dnorm function will produce the probability density based on a mean and standard deviation.
+
+y.plot <-  dnorm(seq(-10,30, length.out = 100),
+                 mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+                 sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+#create a density that is scaled to fit in the plot  since the density has a different range from the data density.
+#!!! this is helpful for putting multiple things on the same plot
+#!!! It might seem confusing at first. It means the maximum value of the plot is always the same between the two datasets on the plot. Here both plots share zero as a minimum.
+y.scaled <- (max(h1$density)/max(y.plot)) * y.plot
+
+#points function adds points or lines to a graph  
+#the first two arguements are the x coordinates and the y coordinates.
+
+points(x.plot,
+       y.scaled, 
+       type = "l", 
+       col = "royalblue3",
+       lwd = 4, 
+       lty = 2)
+
+help(dnorm)
+#pnorm(value to evaluate at (note this will evaluate for all values and below),mean, standard deviation)
+#evaluating freezing temperature probabilities, Aberdeen
+pnorm(0,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+#pnrom with 5 gives me all probability (area of the curve) below 5 
+pnorm(5,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+#subtracting area below zero
+pnorm(5,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))- pnorm(0,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+#pnorm of 20 gives me all probability (area of the curve) below 20 
+#subtracting from one leaves me with the area above 20
+1 - pnorm(20,
+          mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+          sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+#evaluating where unusually high temperatures start at, Aberdeen
+qnorm(0.95,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
+####Question 7####
+#make a histogram of daily precipitation, Aberdeen
+hist(datW$PRCP[datW$siteN == 1],
+     freq=FALSE, 
+     main = paste(levels(datW$NAME)[1]),
+     xlab = "Daily Precipitation", 
+     ylab="Relative frequency",
+     col="purple4",
+     border="white")
+
+####Question 8####
+#use sum function with aggregate function
+yrprcp<-aggregate(datW$PRCP, by=list(datW$NAME, datW$year), FUN = "sum", na.rm = TRUE)
+#naming columns for yrprcp
+colnames(yrprcp)<-c("NAME","YEAR","PRCP")
 
 
-                      
+
+
