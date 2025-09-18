@@ -39,7 +39,7 @@ str(datW)
 
 #specify a column with a proper date format
 #note the format here dataframe$column
-#format without $ sign will create a value
+#format without $ sign will create a vector
 datW$dateF<-as.Date(datW$DATE, "%Y-%m-%d")
 
 #google date formatting in r to find more options and learn more
@@ -48,4 +48,16 @@ datW$dateF<-as.Date(datW$DATE, "%Y-%m-%d")
 #and indicating that it should be treated as numeric data
 datW$year<-as.numeric(format(datW$dateF, "%Y"))
 
+#Question 2, create example vector of each data type with 5 objects in it
+#creating a vector of character data with 5 colors
+vector_character<-c("blue", "red","green","pink","yellow")
+#creating a vector of numeric data with 5 numbers
+vector_numeric<-c(1.2,1.1,3.141,2.5,72.9)
+#creating a vector of integer data with 5 integers
+vector_integer<-c(10L,3L,4L,8L,1L)
+#creating a vector of factor data with 5 objects and 3 levels
+vector_factor<-factor(c("blue", "red", "green", "blue", "red"))
 
+
+
+                      
