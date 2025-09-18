@@ -248,12 +248,18 @@ qnorm(0.95,
       mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
       sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
 
+####Question 6####
+#add 4 to the mean
+1 - pnorm(18.51026,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE)+4,
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
 ####Question 7####
 #make a histogram of daily precipitation, Aberdeen
 hist(datW$PRCP[datW$siteN == 1],
      freq=FALSE, 
      main = paste(levels(datW$NAME)[1]),
-     xlab = "Daily Precipitation", 
+     xlab = "Daily Precipitation mm", 
      ylab="Relative frequency",
      col="purple4",
      border="white")
@@ -264,6 +270,16 @@ yrprcp<-aggregate(datW$PRCP, by=list(datW$NAME, datW$year), FUN = "sum", na.rm =
 #naming columns for yrprcp
 colnames(yrprcp)<-c("NAME","YEAR","PRCP")
 
+hist(yrprcp$PRCP[yrprcp$NAME == "ABERDEEN, WA US"],
+     freq=FALSE, 
+     main = print("ABERDEEN, WA US"),
+     xlab = "Annual Precipitation mm", 
+     ylab="Relative frequency",
+     col="orange",
+     border="white")
 
-
-
+####Question 9####
+#using mean function in aggregate function
+avgyrprcp<-aggregate(yrprcp$PRCP, by=list(yrprcp$NAME), FUN="mean", na.rm=TRUE)
+#naming avgyrprcp columns
+colnames(avgyrprcp)<-c("NAME", "AVGYRPRCP")
