@@ -10,3 +10,9 @@ assert <- function(statement,err.message){
 #check how the statement works
 #evaluate a false statement
 assert(1 == 2, "error: unequal values")
+#evaluate a true statement
+assert(2 == 2, "error: unequal values")
+#set up assert to check if two vectors are the same length
+a <- c(1,2,3,4)
+b <- c(8,4,5)
+assert(length(a) == length(b), "error: unequal length")
