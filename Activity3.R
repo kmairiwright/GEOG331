@@ -33,7 +33,7 @@ sensorInfo <-   read.csv("Z:\\kmwright\\data\\bewkes_weather.csv",
 print(sensorInfo)
 
 #get column names from sensorInfo table
-# and set weather station colnames  to be the same
+#and set weather station colnames  to be the same
 colnames(datW) <-   colnames(sensorInfo)
 #preview data
 print(datW[1,])
@@ -43,8 +43,7 @@ help("read.csv")
 
 #use install.packages to install lubridate
 #install.packages(c("lubridate"))
-#it is helpful to comment this line after you run this line of code on the computer
-#and the package installs. You really don't want to do this over and over again.
+#it is helpful to comment this line
 #working on new computer don't forget uncomment and run lubridate
 
 library(lubridate)
@@ -84,14 +83,8 @@ plot(datW$DD, datW$soil.moisture, pch=19, type="b", xlab = "Day of Year",
 plot(datW$DD, datW$air.temperature, pch=19, type="b", xlab = "Day of Year",
      ylab="Air temperature (degrees C)")
 
-#I'm going to make a new column to work with that indicates that I am conducting QAQC
-#because overwriting values should be done cautiously and can lead to confusing issues.
-#It can be particularly confusing when you are just learning R.
-#Here I'm using the ifelse function
-#the first argument is a logical statement to be evaluated as true or false on a vector
-#the second argument is the value that my air.tempQ1 column will be given if the statement
-#is true. The last value is the value that will be given to air.tempQ1 if the statement is false.
-#In this case it is just given the air temperature value
+
+#Conducting QAQC on air.temp
 datW$air.tempQ1 <- ifelse(datW$air.temperature < 0, NA, datW$air.temperature)
 
 #check the values at the extreme range of the data
@@ -121,10 +114,11 @@ points(datW$DD[lightscale > 0], lightscale[lightscale > 0],
 
 ### QUESTION 5 ###
 
+#create assert test for Q5
 assert(length(lightscale) == nrow(datW), "error: unequal rows")
 
 #filter out storms in wind and air temperature measurements
-# filter all values with lightning that coincides with rainfall greater than 2mm or only rainfall over 5 mm.    
+#filter all values with lightning that coincides with rainfall greater than 2mm or only rainfall over 5 mm.    
 #create a new air temp column
 datW$air.tempQ2 <- ifelse(datW$precipitation  >= 2 & datW$lightning.acvitivy >0, NA,
                           ifelse(datW$precipitation > 5, NA, datW$air.tempQ1))
@@ -136,28 +130,79 @@ datW$wind.speedQ1 <- ifelse(datW$precipitation >= 2 & datW$lightning.acvitivy >0
                       ifelse(datW$precipitation > 5, NA, datW$wind.speed))
 
 #sum(is.na()) will return number of NAs in the data 
+#similar to length(which(is.na()))
 assert(sum(is.na(datW$wind.speed))==sum(is.na(datW$wind.speedQ1)), "error: unequal NAs")
 
-#plotting wind speed (q1) data, type = b for lines and points
-plot(datW$DD, datW$wind.speedQ1, pch = 20, lwd = 1.5, type = "b", xlab="Day of the Year", ylab="Wind Speed (m/s)")
+#plotting wind speed Q1 data, type = b for lines and points
+plot(datW$DD, datW$wind.speedQ1, 
+     pch = 20, lwd = 1.5, type = "b", 
+     xlab="Day of the Year", ylab="Wind Speed (m/s)")
 
 ### Question 7 ###
 
 #plot soil moisture and precipitation onto the same graph to compare
 #change margins to allow room for 2nd y axis
 par(mar=c(5.1,4.1,4.1, 4.1))
-plot(datW$DD [datW$soil.moisture>0], datW$soil.moisture, pch = 20, type = "p", xlab = "Day of the Year", ylab = "Soil Moisture (meters cubed per meters cubed)")
+plot(datW$DD [datW$soil.moisture>0], datW$soil.moisture, 
+     pch = 20, type = "p", 
+     xlab = "Day of the Year", ylab = "Soil Moisture (meters cubed per meters cubed)")
 #set par(new) to true to allow for secondary data on same plot
 par(new= TRUE)
-plot(datW$DD [datW$soil.moisture>0], datW$precipitation, pch = 20, col = "red", type = "p", axes = FALSE, xlab ="", ylab = "" )
+plot(datW$DD [datW$soil.moisture>0], datW$precipitation, 
+     pch = 20, col = "red", type = "p", 
+     axes = FALSE, xlab ="", ylab = "" )
 #create second y axis label
 axis(side=4, col="red")
 mtext("Precipitation (mm)", side = 4, line = 2, col="red")
 
 #plot soil temperature and air temperature onto the same graph to compare
-plot(datW$DD [datW$soil.temp>0], datW$soil.temp, lwd = 2, col = "orange", type = "l", xlab = "Day of the Year", ylab = "Soil and Air Temperature (degrees C)")
-lines(datW$DD [datW$soil.temp>0], datW$air.temperature, col="lightblue", lwd = 2)
+plot(datW$DD [datW$soil.temp>0], datW$soil.temp, 
+     lwd = 2, col = "orange", type = "l", 
+     xlab = "Day of the Year", ylab = "Soil and Air Temperature (degrees C)")
+lines(datW$DD [datW$soil.temp>0], datW$air.temperature, 
+      col="lightblue", lwd = 2)
 #add a legend
-legend("topright", legend = c("Soil Temperature", "Air Temperature"), col=c("orange", "lightblue"), lty=c(1,1))
+legend("topright", legend = c("Soil Temperature", "Air Temperature"), 
+       col=c("orange", "lightblue"), lty=c(1,1))
+
+### Question 8 ###
+
+#calculating average of air temp, wind speed, soil moisture, and soil temp. in June/July 2018
+#Sum of NAs needed to know which observations were ignored
+avg_air.temp<-mean(datW$air.temperature, na.rm=TRUE)
+sum(is.na(datW$air.temperature))
+avg_wind.speed<-mean(datW$wind.speed, na.rm=TRUE)
+sum(is.na(datW$wind.speed))
+avg_soil.mois<-mean(datW$soil.moisture, na.rm=TRUE)
+sum(is.na(datW$soil.moisture))
+avg_soil.temp<-mean(datW$soil.temp, na.rm=TRUE)
+sum(is.na(datW$soil.temp))
+#calculating averages for quality controlled air temperature and wind speed
+avg_air.tempQ2<-mean(datW$air.tempQ2, na.rm=TRUE)
+sum(is.na(datW$air.tempQ2))
+avg_wind.speedQ1<-mean(datW$wind.speedQ1, na.rm=TRUE)
+sum(is.na(datW$wind.speedQ1))
+#calculating total precipitation in June/July 2018
+total_precip<-sum(datW$precipitation, na.rm=TRUE)
+sum(is.na(datW$precipitation))
+
+### Question 9 ###
+#add all plots to same window (soil moisture, air temperature, soil temperature, and precipitation)
+par(mfrow=c(2,2))
+plot(datW$DD, datW$soil.moisture, 
+     lwd = 2, col = "coral2", type = "l", 
+     xlab = "Day of the Year", ylab = "Soil Moisture (meter cubed per meter cubed)")
+plot(datW$DD, datW$air.temperature, 
+     lwd = 2, col = "cyan4", type = "l", 
+     xlab = "Day of the Year", ylab = "Air Temperature (degrees C)")
+plot(datW$DD, datW$soil.temp, 
+     lwd = 2, col = "darkolivegreen4", type = "l", 
+     xlab = "Day of the Year", ylab = "Soil Temperature (degrees C)")
+plot(datW$DD, datW$precipitation, 
+     lwd = 2, col = "deepskyblue3", type = "l", 
+     xlab = "Day of the Year", ylab = "Precipitation (mm)")
+     
+
+
 
 
