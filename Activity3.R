@@ -141,4 +141,23 @@ assert(sum(is.na(datW$wind.speed))==sum(is.na(datW$wind.speedQ1)), "error: unequ
 #plotting wind speed (q1) data, type = b for lines and points
 plot(datW$DD, datW$wind.speedQ1, pch = 20, lwd = 1.5, type = "b", xlab="Day of the Year", ylab="Wind Speed (m/s)")
 
+### Question 7 ###
+
+#plot soil moisture and precipitation onto the same graph to compare
+#change margins to allow room for 2nd y axis
+par(mar=c(5.1,4.1,4.1, 4.1))
+plot(datW$DD [datW$soil.moisture>0], datW$soil.moisture, pch = 20, type = "p", xlab = "Day of the Year", ylab = "Soil Moisture (meters cubed per meters cubed)")
+#set par(new) to true to allow for secondary data on same plot
+par(new= TRUE)
+plot(datW$DD [datW$soil.moisture>0], datW$precipitation, pch = 20, col = "red", type = "p", axes = FALSE, xlab ="", ylab = "" )
+#create second y axis label
+axis(side=4, col="red")
+mtext("Precipitation (mm)", side = 4, line = 2, col="red")
+
+#plot soil temperature and air temperature onto the same graph to compare
+plot(datW$DD [datW$soil.temp>0], datW$soil.temp, lwd = 2, col = "orange", type = "l", xlab = "Day of the Year", ylab = "Soil and Air Temperature (degrees C)")
+lines(datW$DD [datW$soil.temp>0], datW$air.temperature, col="lightblue", lwd = 2)
+#add a legend
+legend("topright", legend = c("Soil Temperature", "Air Temperature"), col=c("orange", "lightblue"), lty=c(1,1))
+
 
