@@ -26,4 +26,3 @@ regresults<-list()
 for(i in 1:3){
   regresults [[i]]<-lm(as.formula(regforms1[i]), flower)
 }
-
