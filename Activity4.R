@@ -5,37 +5,25 @@ rm(list=ls())
 
 #use built in iris dataset
 head(iris)
-#load in some tidyverse packages
+#load in tidyverse packages
 #install.packages(c("tidyverse"))
 library(tidyverse)
 
 ## Part 1: for loops##
 
-#using only data for iris versicolor
+#iris versicolor data
 flower<-iris[iris$Species=="versicolor",]
 
-#write a for loop
-#that produces a regression table
-#for each of the following relationships
-#1. iris  sepal length x width
-#2. iris  petal length x width
-#3. iris sepal length x petal length
+#creating vector to hold regression variables
+regforms1<-c("Sepal.Length~Sepal.Width",
+             "Petal.Length~Petal.Width",
+             "Sepal.Length~Petal.Length")
 
-#hint: consider using a list, and also new vectors for regression variables
-
-#create list with formulas to refer to in for loop
-regforms<-list(
-  flower$Sepal.Length~flower$Sepal.Width,
-  flower$Petal.Length~flower$Petal.Width,
-  flower$Sepal.Length~flower$Petal.Length
-)
-
-#create empty list for regression results
+#create empty list to hold results
 regresults<-list()
 
-#create for loop to run regression tables
+#create for loop to run regression model 
 for(i in 1:3){
- regresults [[i]]<-lm(regforms[[i]], flower)
+  regresults [[i]]<-lm(as.formula(regforms1[i]), flower)
 }
-
 
