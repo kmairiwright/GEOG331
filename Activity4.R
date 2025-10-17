@@ -38,3 +38,5 @@ for(i in 1:3){
  regresults [[i]]<-lm(regforms[[i]], flower)
 }
 
+
+
