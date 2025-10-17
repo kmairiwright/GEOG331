@@ -1,5 +1,5 @@
 #Activity 4
-#KW, 10/09/2025-
+#KW, 10/09/2025-10/17/2025
 
 rm(list=ls())
 
@@ -55,8 +55,11 @@ plot(iris$Sepal.Length,iris$Sepal.Width)
 
 #load in ggplot2
 library(ggplot2)
-
 #3a. make the same plot in ggplot
+ggplot(data=iris,
+       aes(x=Sepal.Length, y=Sepal.Width))+
+      geom_point(shape=1)
+
 #3b. get rid of grid lines
 #3c. add title and axis labels,
 #show species by color, 
