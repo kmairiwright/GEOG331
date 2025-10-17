@@ -38,10 +38,3 @@ for(i in 1:3){
  regresults [[i]]<-lm(regforms[[i]], flower)
 }
 
-## Part 2: data in dplyr ##
-
-#use dplyr to join data of maximum height
-#to a new iris data frame
-height <- data.frame(Species = c("virginica","setosa","versicolor"),
-                     Height.cm = c(60,100,11.8))
-
