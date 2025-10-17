@@ -6,10 +6,11 @@ rm(list=ls())
 #use built in iris dataset
 head(iris)
 #load in some tidyverse packages
-install.packages(c("tidyverse"))
+#install.packages(c("tidyverse"))
 library(tidyverse)
 
 ## Part 1: for loops##
+
 #using only data for iris versicolor
 flower<-iris[iris$Species=="versicolor",]
 
@@ -20,12 +21,27 @@ flower<-iris[iris$Species=="versicolor",]
 #2. iris  petal length x width
 #3. iris sepal length x petal length
 
-# hint: consider using a list, and also new vectors for regression variables
+#hint: consider using a list, and also new vectors for regression variables
 
-regtab_list<-list()
+#create list with formulas to refer to in for loop
+regforms<-list(
+  flower$Sepal.Length~flower$Sepal.Width,
+  flower$Petal.Length~flower$Petal.Width,
+  flower$Sepal.Length~flower$Petal.Length
+)
 
-regvar<-c("flower$Sepal.Length", "flower$Sepal.Width", "flower$Petal.Length", "flower$Petal.Width")
+#create empty list for regression results
+regresults<-list()
 
-for(regvar in 1:4){
-  lm(regvar)
+#create for loop to run regression tables
+for(i in 1:3){
+ regresults [[i]]<-lm(regforms[[i]], flower)
 }
+
+## Part 2: data in dplyr ##
+
+#use dplyr to join data of maximum height
+#to a new iris data frame
+height <- data.frame(Species = c("virginica","setosa","versicolor"),
+                     Height.cm = c(60,100,11.8))
+
