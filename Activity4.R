@@ -53,13 +53,24 @@ IrisHeight<-left_join(Iris,height,by="Species")
 #look at base R scatter plot
 plot(iris$Sepal.Length,iris$Sepal.Width)
 
-#3a. make the same plot in ggplot
 #load in ggplot2
 library(ggplot2)
 
+#3a. make the same plot in ggplot
+#3b. get rid of grid lines
+#3c. add title and axis labels,
+#show species by color, 
+#make the point size proportional to petal length
 ggplot(data=iris, 
-       aes=(x=iris$Sepal.Length, y=iris$Sepal.Width)
-       + geom_point())
+      aes(x=Sepal.Length, y=Sepal.Width, 
+          color=Species, size=Petal.Length))+
+      geom_point()+
+      theme_classic()+
+      labs(x="Iris Sepal Width", 
+           y="Iris Sepal Length",
+           title="Iris Scatter Plot")
+      
+      
 
         
 
