@@ -16,6 +16,6 @@ NOAAFlashFlood$BEGIN_DATE<-as.Date(NOAAFlashFlood$BEGIN_DATE,format="%m/%d/%Y")
 ggplot(data=NOAAFlashFlood,
       aes(x=BEGIN_DATE))+
       geom_histogram(binwidth=30, fill="darkblue")+
-      labs(title="Monthly Grand County Flash Flood Reports (2001-2021)",
+      labs(title="Grand County Flash Flood Reports (2001-2021), Monthly",
            x="Date",
            y="Count")
