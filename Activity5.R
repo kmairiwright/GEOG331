@@ -210,9 +210,7 @@ legend(x=310,y=150, c("mean","1 sd","2017"),
        pch=c(NA,15,NA),
        bty="n")
        
-
-
-
+#### Question 7 ####
 
 
 
