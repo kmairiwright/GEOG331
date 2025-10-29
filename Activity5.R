@@ -7,13 +7,13 @@ rm(list=ls())
 library(lubridate)
 
 #read in streamflow data
-datH<-read.csv("Z:\\data\\hw5_data\\stream_flow_data.csv",
+datH<-read.csv("/Volumes/GEOG331_F25/data/hw5_data/stream_flow_data.csv",
                na.strings = c("Eqp"))
 head(datH)
 
 #read in precipitation data
 #hourly precipitation is in mm
-datP <- read.csv("Z:\\data\\hw5_data\\2049867.csv")                            
+datP <- read.csv("/Volumes/GEOG331_F25/data/hw5_data/2049867.csv")                            
 head(datP)
 
 #only use most reliable measurements
@@ -172,7 +172,46 @@ legend("topright", c("mean","1 standard deviation"), #legend items
        pch=c(NA,15),#symbols
        bty="n")#no legend border
 
+#### QUESTION 5 #####
 
+#add month to datD
+datD$month<-month(datesD)
+#reconfigure aveF to list by month
+aveF<-aggregate(datD$discharge,by=list(datD$month),FUN="mean")
+colnames(aveF)<-c("month","dailyAve")
+
+#recalculate sdf so dailyaves are the same length
+
+#plot discharge graph with months
+plot(aveF$month,aveF$dailyAve,
+     type="l",
+     xlab="Month",
+     ylab=expression(paste("Discharge ft"^"3", "sec"^"-1")),
+     lwd=2,
+     ylim=c(0,90),
+     xaxs="i",yaxs="i",
+     axes=FALSE)
+
+polygon(c(aveF$month, rev(aveF$month)),
+        c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),
+        col=rgb(0.392, 0.584, 0.929,.2), 
+        border=NA)
+
+#add 2017 discharge line
+lines(datD$month[datD$year==2017],datD$discharge[datD$year==2017],
+     lwd=2,
+     col="red")
+
+axis(1, seq(0,360, by=40), 
+     lab=seq(0,360, by=40)) 
+axis(2, seq(0,80, by=20),
+     seq(0,80, by=20),
+     las = 2)
+legend("topright", c("mean","1 standard deviation","2017"), 
+       lwd=c(2,NA,2),
+       col=c("black",rgb(0.392, 0.584, 0.929,.2),"red"),
+       pch=c(NA,15,NA),
+       bty="n")
 
 
 
