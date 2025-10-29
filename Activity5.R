@@ -6,20 +6,20 @@ rm(list=ls())
 #load in lubridate
 library(lubridate)
 
-#read in streamflow data
-datH<-read.csv("/Volumes/GEOG331_F25/data/hw5_data/stream_flow_data.csv",
+#read in stream flow data
+datH<-read.csv("Z:\\data\\hw5_data\\stream_flow_data.csv",
                na.strings = c("Eqp"))
 head(datH)
 
 #read in precipitation data
 #hourly precipitation is in mm
-datP <- read.csv("/Volumes/GEOG331_F25/data/hw5_data/2049867.csv")                            
+datP <- read.csv("Z:\\data\\hw5_data\\2049867.csv")                            
 head(datP)
 
 #only use most reliable measurements
 datD<-datH[datH$discharge.flag == "A",]
 
-#### define time for streamflow #####
+#### define time for stream flow #####
 #convert date and time
 datesD <- as.Date(datD$date, "%m/%d/%Y")
 #get day of year
@@ -176,44 +176,40 @@ legend("topright", c("mean","1 standard deviation"), #legend items
 
 #add month to datD
 datD$month<-month(datesD)
-#reconfigure aveF to list by month
-aveF<-aggregate(datD$discharge,by=list(datD$month),FUN="mean")
-colnames(aveF)<-c("month","dailyAve")
-
-#recalculate sdf so dailyaves are the same length
 
 #plot discharge graph with months
-plot(aveF$month,aveF$dailyAve,
+plot(aveF$doy,aveF$dailyAve,
      type="l",
      xlab="Month",
      ylab=expression(paste("Discharge ft"^"3", "sec"^"-1")),
      lwd=2,
-     ylim=c(0,90),
+     ylim=c(0,160),
+     xlim=c(1,365),
      xaxs="i",yaxs="i",
      axes=FALSE)
 
-polygon(c(aveF$month, rev(aveF$month)),
+polygon(c(aveF$doy, rev(aveF$doy)),
         c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),
         col=rgb(0.392, 0.584, 0.929,.2), 
         border=NA)
 
 #add 2017 discharge line
-lines(datD$month[datD$year==2017],datD$discharge[datD$year==2017],
-     lwd=2,
-     col="red")
+lines(datD$doy[datD$year==2017],datD$discharge[datD$year==2017],
+     lwd=1,
+     col=c("#D9544D"))
 
-axis(1, seq(0,360, by=40), 
-     lab=seq(0,360, by=40)) 
-axis(2, seq(0,80, by=20),
-     seq(0,80, by=20),
+axis(1, at=c(15,45,74,105,135,166,196,227,258,288,319,349),
+     lab=month.abb)
+axis(2, seq(0,160, by=20),
+     seq(0,160, by=20),
      las = 2)
-legend("topright", c("mean","1 standard deviation","2017"), 
+abline(h=0, xpd=FALSE)
+legend(x=310,y=150, c("mean","1 sd","2017"), 
        lwd=c(2,NA,2),
-       col=c("black",rgb(0.392, 0.584, 0.929,.2),"red"),
+       col=c("black",rgb(0.392, 0.584, 0.929,.2),"#D9544D"),
        pch=c(NA,15,NA),
        bty="n")
-
-
+       
 
 
 
