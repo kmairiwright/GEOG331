@@ -116,3 +116,18 @@ date_complete<-names(date_counts[date_counts == 24])
 #create data frame with 24 hr only data
 datPcomplete<-datP[datP$jdate %in% as.Date(date_complete),]
 
+#plot datD data and visualize datPcomplete data distinctly
+plot(aveF$doy, aveF$dailyAve,
+     type="l",
+     xlab="Day of the Year",
+     ylab=expression(paste("Discharge ft"^"3", "sec"^"-1"))
+)
+
+     
+     
+     
+     
+     
+     
+     
+     
