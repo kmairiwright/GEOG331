@@ -120,12 +120,13 @@ datPcomplete<-datP[datP$jdate %in% as.Date(date_complete),]
 date_complete<-as.Date(date_complete)
 #add date format to datD dataframe
 datD$DATE<-datesD
-datD$DATE<-as.Date(datD$DATE, format="%Y-%m-%d")
 #create column for true/false if 24hrs of precipitation data
 datD$full.precip<-datD$DATE %in% date_complete
 table(datD$full.precip)
 
 #plot datD data and visualize datPcomplete data distinctly
+dev.off()
+
 plot(datD$DATE, datD$discharge,
      type="l",
      col="darkgray",
@@ -139,8 +140,16 @@ points (datD$DATE[datD$full.precip],
         datD$discharge[datD$full.precip],
         col="darkblue",
         pch=19)
-     
-     
+
+#add a legend
+legend(locator(1),
+       legend=c("All data", "24hr precip. data"),
+       col=c("darkgray","darkblue"),
+       lwd=c(1.5,NA),
+       pch=c(NA,19),
+       pt.cex=1.2)
+
+   
      
      
      
