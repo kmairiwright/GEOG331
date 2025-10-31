@@ -54,123 +54,15 @@ datP$decDay <- datP$doy + (datP$hour/24)
 datP$decYear <- ifelse(leap_year(datP$year),datP$year + (datP$decDay/366),
                        datP$year + (datP$decDay/365)) 
 
-#plot discharge
-plot(datD$decYear, datD$discharge, 
-     type="l", 
-     xlab="Year", 
-     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")))
-
 #basic formatting
 aveF <- aggregate(datD$discharge, by=list(datD$doy), FUN="mean")
 colnames(aveF) <- c("doy","dailyAve")
 sdF <- aggregate(datD$discharge, by=list(datD$doy), FUN="sd")
 colnames(sdF) <- c("doy","dailySD")
 
+
 #start new plot
 dev.new(width=8,height=8)
-
-#bigger margins
-par(mai=c(1,1,1,1))
-#make plot
-plot(aveF$doy,aveF$dailyAve, 
-     type="l", 
-     xlab="Year", 
-     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")),
-     lwd=2)
-
-
-#bigger margins
-par(mai=c(1,1,1,1))
-#make plot
-plot(aveF$doy,aveF$dailyAve, 
-     type="l", 
-     xlab="Year", 
-     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")),
-     lwd=2,
-     ylim=c(0,90),
-     xaxs="i", yaxs ="i")#remove gaps from axes  
-#show standard deviation around the mean
-polygon(c(aveF$doy, rev(aveF$doy)),#x coordinates
-        c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),#ycoord
-        col=rgb(0.392, 0.584, 0.929,.2), #color that is semi-transparent
-        border=NA#no border
-)
-
-#bigger margins
-par(mai=c(1,1,1,1))
-#make plot
-plot(aveF$doy,aveF$dailyAve, 
-     type="l", 
-     xlab="Year", 
-     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")),
-     lwd=2,
-     ylim=c(0,90),
-     xaxs="i", yaxs ="i",#remove gaps from axes
-     axes=FALSE)#no axes
-polygon(c(aveF$doy, rev(aveF$doy)),#x coordinates
-        c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),#ycoord
-        col=rgb(0.392, 0.584, 0.929,.2), #color that is semi-transparent
-        border=NA#no border
-)       
-axis(1, seq(0,360, by=40), #tick intervals
-     lab=seq(0,360, by=40)) #tick labels
-axis(2, seq(0,80, by=20),
-     seq(0,80, by=20),
-     las = 2)#show ticks at 90 degree angle
-
-#bigger margins
-par(mai=c(1,1,1,1))
-#make plot
-plot(aveF$doy,aveF$dailyAve, 
-     type="l", 
-     xlab="Year", 
-     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")),
-     lwd=2,
-     ylim=c(0,90),
-     xaxs="i", yaxs ="i",#remove gaps from axes
-     axes=FALSE)#no axes
-polygon(c(aveF$doy, rev(aveF$doy)),#x coordinates
-        c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),#ycoord
-        col=rgb(0.392, 0.584, 0.929,.2), #color that is semi-transparent
-        border=NA#no border
-)       
-axis(1, seq(0,360, by=40), #tick intervals
-     lab=seq(0,360, by=40)) #tick labels
-axis(2, seq(0,80, by=20),
-     seq(0,80, by=20),
-     las = 2)#show ticks at 90 degree angle
-legend("topright", c("mean","1 standard deviation"), #legend items
-       lwd=c(2,NA),#lines
-       fill=c(NA,rgb(0.392, 0.584, 0.929,.2)),#fill boxes
-       border=NA,#no border for both fill boxes (don't need a vector here since both are the same)
-       bty="n")#no legend border
-
-#bigger margins
-par(mai=c(1,1,1,1))
-#make plot
-plot(aveF$doy,aveF$dailyAve, 
-     type="l", 
-     xlab="Year", 
-     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")),
-     lwd=2,
-     ylim=c(0,90),
-     xaxs="i", yaxs ="i",#remove gaps from axes
-     axes=FALSE)#no axes
-polygon(c(aveF$doy, rev(aveF$doy)),#x coordinates
-        c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),#ycoord
-        col=rgb(0.392, 0.584, 0.929,.2), #color that is semi-transparent
-        border=NA#no border
-)       
-axis(1, seq(0,360, by=40), #tick intervals
-     lab=seq(0,360, by=40)) #tick labels
-axis(2, seq(0,80, by=20),
-     seq(0,80, by=20),
-     las = 2)#show ticks at 90 degree angle
-legend("topright", c("mean","1 standard deviation"), #legend items
-       lwd=c(2,NA),#lines
-       col=c("black",rgb(0.392, 0.584, 0.929,.2)),#colors
-       pch=c(NA,15),#symbols
-       bty="n")#no legend border
 
 #### QUESTION 5 #####
 
@@ -187,7 +79,7 @@ plot(aveF$doy,aveF$dailyAve,
      xlim=c(1,365),
      xaxs="i",yaxs="i",
      axes=FALSE)
-
+#add standard dev.
 polygon(c(aveF$doy, rev(aveF$doy)),
         c(aveF$dailyAve-sdF$dailySD,rev(aveF$dailyAve+sdF$dailySD)),
         col=rgb(0.392, 0.584, 0.929,.2), 
@@ -198,12 +90,15 @@ lines(datD$doy[datD$year==2017],datD$discharge[datD$year==2017],
      lwd=1,
      col=c("#D9544D"))
 
+#add month labels
 axis(1, at=c(15,45,74,105,135,166,196,227,258,288,319,349),
      lab=month.abb)
 axis(2, seq(0,160, by=20),
      seq(0,160, by=20),
      las = 2)
+#extend x-axis
 abline(h=0, xpd=FALSE)
+#move legend so it doesn't interfere with plot
 legend(x=310,y=150, c("mean","1 sd","2017"), 
        lwd=c(2,NA,2),
        col=c("black",rgb(0.392, 0.584, 0.929,.2),"#D9544D"),
@@ -212,5 +107,12 @@ legend(x=310,y=150, c("mean","1 sd","2017"),
        
 #### Question 7 ####
 
-
+#make a column with just date
+datP$jdate<-as.Date(datP$DATE, "%Y%m%d")
+#count how many have same date (frequency of date occurrence)
+date_counts<-table(datP$jdate)
+#isolate dates that have all 24 hrs of data
+date_complete<-names(date_counts[date_counts == 24])
+#create data frame with 24 hr only data
+datPcomplete<-datP[datP$jdate %in% as.Date(date_complete),]
 
