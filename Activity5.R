@@ -7,13 +7,13 @@ rm(list=ls())
 library(lubridate)
 
 #read in stream flow data
-datH<-read.csv("Z:\\data\\hw5_data\\stream_flow_data.csv",
+datH<-read.csv("/Volumes/GEOG331_F25/data/hw5_data/stream_flow_data.csv",
                na.strings = c("Eqp"))
 head(datH)
 
 #read in precipitation data
 #hourly precipitation is in mm
-datP <- read.csv("Z:\\data\\hw5_data\\2049867.csv")                            
+datP <- read.csv("/Volumes/GEOG331_F25/data/hw5_data/2049867.csv")                            
 head(datP)
 
 #only use most reliable measurements
@@ -112,17 +112,33 @@ datP$jdate<-as.Date(datP$DATE, "%Y%m%d")
 #count how many have same date (frequency of date occurrence)
 date_counts<-table(datP$jdate)
 #isolate dates that have all 24 hrs of data
-date_complete<-names(date_counts[date_counts == 24])
+date_complete<-as.Date(names(date_counts[date_counts == 24]),format="%Y-%m-%d")
 #create data frame with 24 hr only data
 datPcomplete<-datP[datP$jdate %in% as.Date(date_complete),]
 
+#convert character table to date
+date_complete<-as.Date(date_complete)
+#add date format to datD dataframe
+datD$DATE<-datesD
+datD$DATE<-as.Date(datD$DATE, format="%Y-%m-%d")
+#create column for true/false if 24hrs of precipitation data
+datD$full.precip<-datD$DATE %in% date_complete
+table(datD$full.precip)
+
 #plot datD data and visualize datPcomplete data distinctly
-plot(aveF$doy, aveF$dailyAve,
+plot(datD$DATE, datD$discharge,
      type="l",
+     col="darkgray",
+     lwd=1.5,
      xlab="Day of the Year",
-     ylab=expression(paste("Discharge ft"^"3", "sec"^"-1"))
+     ylab=expression(paste("Discharge ft"^"3", "sec"^"-1")),
+     main="Stream Discharge with Full Precipitation Days Symbolized"
 )
 
+points (datD$DATE[datD$full.precip],
+        datD$discharge[datD$full.precip],
+        col="darkblue",
+        pch=19)
      
      
      
