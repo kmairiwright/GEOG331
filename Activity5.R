@@ -1,5 +1,5 @@
 #Activity 5
-#KW, 10/28/2025-
+#KW, 10/28/2025-11/3/2025
 
 rm(list=ls())
 
@@ -11,17 +11,15 @@ library(ggplot2)
 #read in stream flow data
 datH<-read.csv("/Volumes/GEOG331_F25/data/hw5_data/stream_flow_data.csv",
                na.strings = c("Eqp"))
-head(datH)
 
 #read in precipitation data
 #hourly precipitation is in mm
 datP <- read.csv("/Volumes/GEOG331_F25/data/hw5_data/2049867.csv")                            
-head(datP)
 
 #only use most reliable measurements
 datD<-datH[datH$discharge.flag == "A",]
 
-#### define time for stream flow #####
+##define time for stream flow##
 #convert date and time
 datesD <- as.Date(datD$date, "%m/%d/%Y")
 #get day of year
@@ -31,14 +29,14 @@ datD$year <- year(datesD)
 #define time
 timesD <- hm(datD$time)
 
-#### define time for precipitation #####    
+##define time for precipitation##
 dateP <- ymd_hm(datP$DATE)
 #get day of year
 datP$doy <- yday(dateP)
 #get year 
 datP$year <- year(dateP)
 
-#### get decimal formats #####
+##get decimal formats##
 #convert time from a string to a more usable format
 #with a decimal hour
 datD$hour <- hour(timesD ) + (minute(timesD )/60)
@@ -61,7 +59,6 @@ aveF <- aggregate(datD$discharge, by=list(datD$doy), FUN="mean")
 colnames(aveF) <- c("doy","dailyAve")
 sdF <- aggregate(datD$discharge, by=list(datD$doy), FUN="sd")
 colnames(sdF) <- c("doy","dailySD")
-
 
 #start new plot
 dev.new(width=8,height=8)
@@ -149,11 +146,10 @@ legend(locator(1),
        pch=c(NA,19),
        pt.cex=1.2)
 
+#Hydrographs:
 #subsest discharge and precipitation within range of interest
 hydroD <- datD[datD$doy >= 248 & datD$doy < 250 & datD$year == 2011,]
 hydroP <- datP[datP$doy >= 248 & datP$doy < 250 & datP$year == 2011,] 
-     
-min(hydroD$discharge)
 
 #get minimum and maximum range of discharge to plot
 #go outside of the range so that it's easy to see high/low values
@@ -184,7 +180,7 @@ for(i in 1:nrow(hydroP)){
           col=rgb(0.392, 0.584, 0.929,.2), border=NA)
 }
 
-## Question 8 ##
+#### Question 8 ####
 #read date_complete table to find consecutive dates 
 #with full precipitation data
 date_complete
@@ -218,6 +214,7 @@ for(i in 1:nrow(hydroP2)){
           col=rgb(0.392, 0.584, 0.929,.2), border=NA)
 }
 
+#Box and violin plots:
 #specify year as a factor
 datD$yearPlot <- as.factor(datD$year)
 #make a boxplot
@@ -227,7 +224,7 @@ ggplot(data= datD, aes(yearPlot,discharge)) +
 ggplot(data= datD, aes(yearPlot,discharge)) + 
   geom_violin()
 
-## Question 9 ##
+#### Question 9 ####
 
 #create season column
 datD$Season<-ifelse(month(datD$DATE)%in% c(12,1,2), "Winter",
