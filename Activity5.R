@@ -5,6 +5,8 @@ rm(list=ls())
 
 #load in lubridate
 library(lubridate)
+#load in ggplot2
+library(ggplot2)
 
 #read in stream flow data
 datH<-read.csv("/Volumes/GEOG331_F25/data/hw5_data/stream_flow_data.csv",
@@ -116,8 +118,6 @@ date_complete<-as.Date(names(date_counts[date_counts == 24]),format="%Y-%m-%d")
 #create data frame with 24 hr only data
 datPcomplete<-datP[datP$jdate %in% as.Date(date_complete),]
 
-#convert character table to date
-date_complete<-as.Date(date_complete)
 #add date format to datD dataframe
 datD$DATE<-datesD
 #create column for true/false if 24hrs of precipitation data
@@ -131,7 +131,7 @@ plot(datD$DATE, datD$discharge,
      type="l",
      col="darkgray",
      lwd=1.5,
-     xlab="Day of the Year",
+     xlab="Date",
      ylab=expression(paste("Discharge ft"^"3", "sec"^"-1")),
      main="Stream Discharge with Full Precipitation Days Symbolized"
 )
@@ -183,6 +183,59 @@ for(i in 1:nrow(hydroP)){
           c(yl,hydroP$pscale[i],hydroP$pscale[i],yl),
           col=rgb(0.392, 0.584, 0.929,.2), border=NA)
 }
-     
-     
-     
+
+## Question 8 ##
+#read date_complete table to find consecutive dates 
+#with full precipitation data
+date_complete
+#subsest discharge and precipitation within (new) range of interest
+hydroD2 <- datD[datD$doy >= 62 & datD$doy < 64 & datD$year == 2013,]
+hydroP2 <- datP[datP$doy >= 62 & datP$doy < 64 & datP$year == 2013,] 
+
+#get min and max range of plot
+yl2 <- floor(min(hydroD2$discharge))-1
+yh2 <- ceiling(max(hydroD2$discharge))+1
+#minimum and maximum range of precipitation to plot
+pl2 <- 0
+pm2 <-  ceiling(max(hydroP2$HPCP))+.5
+#scale precipitation to fit on plot
+hydroP2$pscale <- (((yh2-yl2)/(pm2-pl2)) * hydroP2$HPCP) + yl2
+
+par(mai=c(1,1,1,1))
+#make plot of discharge
+plot(hydroD2$decDay,
+     hydroD2$discharge, 
+     type="l", 
+     ylim=c(yl2,yh2), 
+     lwd=2,
+     xlab="Day of year", 
+     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")))
+#add bars to indicate precipitation 
+for(i in 1:nrow(hydroP2)){
+  polygon(c(hydroP2$decDay[i]-0.017,hydroP2$decDay[i]-0.017,
+            hydroP2$decDay[i]+0.017,hydroP2$decDay[i]+0.017),
+          c(yl2,hydroP2$pscale[i],hydroP2$pscale[i],yl2),
+          col=rgb(0.392, 0.584, 0.929,.2), border=NA)
+}
+
+#specify year as a factor
+datD$yearPlot <- as.factor(datD$year)
+#make a boxplot
+ggplot(data= datD, aes(yearPlot,discharge)) + 
+  geom_boxplot()
+#make a violin plot
+ggplot(data= datD, aes(yearPlot,discharge)) + 
+  geom_violin()
+
+## Question 9 ##
+#2016 discharge violin plot
+
+
+
+
+
+
+
+
+
+
