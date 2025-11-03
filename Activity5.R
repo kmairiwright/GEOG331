@@ -228,10 +228,38 @@ ggplot(data= datD, aes(yearPlot,discharge)) +
   geom_violin()
 
 ## Question 9 ##
+
+#create season column
+datD$Season<-ifelse(month(datD$DATE)%in% c(12,1,2), "Winter",
+             ifelse(month(datD$DATE)%in% c(3,4,5), "Spring",
+             ifelse(month(datD$DATE)%in% c(6,7,8), "Summer", "Fall")))
+#turn column into factor for plotting
+datD$Season<-factor(datD$Season, 
+                    levels=c("Winter","Spring","Summer","Fall"))
 #2016 discharge violin plot
-
-
-
+ggplot(data=datD[datD$year==2016,],aes(Season,discharge))+
+  geom_violin(fill="lightblue")+
+  labs(
+    title="2016 Seasonal Discharge",
+    x="Season",
+    y="Discharge"
+  ) +
+  theme_minimal()+
+  theme(
+    plot.title=element_text(hjust=0.5)
+  )
+#2017 violin plot
+ggplot(data=datD[datD$year==2017,],aes(Season,discharge))+
+  geom_violin(fill="darkblue")+
+  labs(
+    title="2017 Seasonal Discharge",
+    x="Season",
+    y="Discharge"
+  ) +
+  theme_minimal()+
+  theme(
+    plot.title=element_text(hjust=0.5)
+  )
 
 
 
