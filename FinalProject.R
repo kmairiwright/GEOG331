@@ -7,10 +7,16 @@ rm(list=ls())
 #install.packages(c("FedData"))
 #install.packages(c("tigris"))
 #install.packages(c("sf"))
+#install.packages(c("sp"))
+#install.packages(c("raster"))
+library(raster)
 library(FedData)
-library(ggplot2)
+library(sp)
 library(tigris)
 library(sf)
+library(dplyr)
+
+
 
 #NOAA data from 1/1/2001 to 12/31/2021 of flash floods
 #in Grand County, Utah
@@ -30,10 +36,13 @@ ggplot(data=NOAAFlashFlood,
 Grand_County_UT<-st_read("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
-  filter(NAME=="Grand")
+  dplyr::filter(NAME=="Grand")
 
-Grand_2015<-download_nlcd(template=Grand_County_Tigris,
+Grand_County_Tigris_sp<-as(Grand_County_Tigris, "Spatial")
+
+Grand_2015<-get_nlcd(template=Grand_County_Tigris_sp,
                      label="Grand County UT",
                      year=2015,
                      extraction.dir="Z:\\kmwright\\data\\Project_Data")
+
 
