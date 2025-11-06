@@ -27,9 +27,7 @@ ggplot(data=NOAAFlashFlood,
            y="Count")
 
 #Land cover dataset using FedData
-Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
-
-Grand_County_sf<-sf::st_as_sf(Grand_County_UT)
+Grand_County_UT<-st_read("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
   filter(NAME=="Grand")
