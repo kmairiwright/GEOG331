@@ -18,7 +18,7 @@ library(raster)
 
 #NOAA data from 1/1/2001 to 12/31/2021 of flash floods
 #in Grand County, Utah
-NOAAFlashFlood<-read.csv("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/storm_data_search_results.csv")
+NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\storm_data_search_results.csv")
 
 #create histogram of flash flood reports, monthly
 NOAAFlashFlood$BEGIN_DATE<-as.Date(NOAAFlashFlood$BEGIN_DATE,format="%m/%d/%Y")
@@ -31,14 +31,14 @@ ggplot(data=NOAAFlashFlood,
        y="Count")
 
 #Land cover dataset using FedData
-Grand_County_UT<-vect("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
+Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
   filter(NAME=="Grand")
 
 grand_vect<-vect(Grand_County_Tigris)
 
-nlcd_2016<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2016_CU_C1V1/Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+nlcd_2016<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2016_CU_C1V1\\Annual_NLCD_LndCov_2016_CU_C1V1.tif")
 grand_vect<-project(grand_vect, crs(nlcd_2016))
 
 nlcd_cropped<-crop(nlcd_2016, grand_vect)
