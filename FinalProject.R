@@ -2,13 +2,7 @@
 #KW 10/24/25-
 
 rm(list=ls())
-#install.packages(c("ggplot2"))
-#install.packages(c("tidyverse"))                 
-#install.packages(c("FedData"))
-#install.packages(c("terra"))
-#install.packages(c("tidyterra"))
-#install.packages(c("tigris"))
-#install.packages(c("raster"))
+
 library(terra)
 library(tidyterra)
 library(FedData)
@@ -20,6 +14,8 @@ library(raster)
 #in Grand County, Utah
 NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\storm_data_search_results.csv")
 
+###HISTOGRAM###
+
 #create histogram of flash flood reports, monthly
 NOAAFlashFlood$BEGIN_DATE<-as.Date(NOAAFlashFlood$BEGIN_DATE,format="%m/%d/%Y")
 
@@ -30,22 +26,33 @@ ggplot(data=NOAAFlashFlood,
        x="Date",
        y="Count")
 
-#Land cover dataset using FedData
+
+
+###LAND COVER PLOT###
+
+#Pull Lat/Long from NOAAFlashFlood
+
+
+#Read in Grand County TGER/Line Shape file, 2024
 Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
+#Use tigris to read in Grand County Shape file, simple 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
   filter(NAME=="Grand")
 
+#vector of tigris data
 grand_vect<-vect(Grand_County_Tigris)
 
+#read in land cover data (NLCD), 2016
 nlcd_2016<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2016_CU_C1V1\\Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+#transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_2016))
 
+#crop and mask NLCD to Grand County 
 nlcd_cropped<-crop(nlcd_2016, grand_vect)
 nlcd_masked<-mask(nlcd_cropped, grand_vect)
 
-plot(nlcd_masked, main = "Grand County, UT NLCD 2016")
-
+#classify NLCD classes with labels and colors
 nlcd_classes <- c(11, 12, 21, 22, 23, 24, 31, 41, 42, 43, 52, 71, 81, 82, 90, 95)
 nlcd_labels <- c(
   "Open Water", "Perennial Ice/Snow", "Developed, Open Space", "Developed, Low Intensity",
@@ -59,21 +66,29 @@ nlcd_colors <- c(
   "#BAD8EA", "#70A3BA"
 )
 
-# Set up a 2-panel layout: 1 for map, 1 for legend
+#create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
 
-# Plot the raster
+#plot NLCD of Grand County
 plot(nlcd_masked, 
      col = nlcd_colors, 
      breaks = c(nlcd_classes, 100), 
      legend=FALSE,
      main = "Grand County, UT NLCD 2016")
 
-# Plot the legend
-par(mar = c(0, 0, 0, 0))  # Remove margins for clean legend
+FFPoints<-vect(NOAAFlashFlood,geom=c("BEGIN_LON","BEGIN_LAT"), crs(nlcd_2016))
+#Try to map FFPoints on NLCD Raster
+points(FFPoints, col="black", pch = 16)
+
+#plot the legend
+#remove the margins
+par(mar = c(0, 0, 0, 0))
 plot.new()
 legend("center", 
        legend = nlcd_labels, 
        fill = nlcd_colors, 
        cex = 0.8, 
        bty = "n")
+
+#plotting FFPoints
+plot(FFPoints, col = "black", pch = 16)
