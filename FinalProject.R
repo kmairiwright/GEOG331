@@ -80,12 +80,16 @@ plot(nlcd_masked,
 points(FFPoints_proj, col="black",pch=16)
 
 
-#plot the legend
+#plot legend for NLCD
 #remove the margins
 par(mar = c(0, 0, 0, 0))
 plot.new()
-legend("center", 
-       legend = nlcd_labels, 
-       fill = nlcd_colors, 
-       cex = 0.8, 
+# NLCD legend
+legend("center",
+       legend = c(nlcd_labels, "Flash Flood Start Point"),
+       fill = c(nlcd_colors, rep(NA, 1)),       
+       pch = c(rep(NA, length(nlcd_labels)), 16), 
+       col = c(rep(NA, length(nlcd_labels)), "black"),
+       pt.cex = 1.2, 
+       cex = 0.8,
        bty = "n")
