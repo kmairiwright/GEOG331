@@ -33,6 +33,8 @@ plot(lc[[5]]*0.0000275-0.2)
 
 # The high values (1-ish) are probably clouds in the imagery
 #used scaling factor "on the fly", did not make a permanent object 
+#in some cases might want to right equation into file, rn R is storing
+#object in memory (not permanent) 
 
 #ndvi = difference between NIR and red, divide by sum of the two to normalize
 #band 5=NIR, band 4=red
@@ -59,14 +61,20 @@ mad_dec <- dec[dec$COUNTY=="MADISON",]
 lc_dec <- crop(dec,lc)
 
 # lastly, create a buffer around the Madison County DEC lands
+#Q is are lands managed by dec more productive
+#if you don't do "singlesided" would get inside and outside buffer
 # what are the units? 
 mad_buf <- buffer(mad_dec, width = 1000, singlesided = T)
 
 # create a plot to look at our Madison County data
 plot(mad_dec, col = "red")
-plot(mad_buf, col = "yellow", add = T)
+plot(mad_buf, col = "yellow", add = T) #add=T adds both plots together
+
+#Here is the analysis: (above is the meat to get to the 3 lines of analysis)
 
 #zonal just gives vector for ndvi number?
+#zonal function: mean value of ndvi inside of every mad_dec
+#adding as attribute to mad_dec att. table
 # calculate ndvi for dec lands
 mad_dec$ndvi_in <- zonal(ndvi, mad_dec, fun = "mean")
 
@@ -76,11 +84,9 @@ mad_dec$ndvi_out <- zonal(ndvi, mad_buf, fun = "mean")
 # calculate the difference to see if DEC lands are more productive
 mad_dec$ndvi_dif <- mad_dec$ndvi_in-mad_dec$ndvi_out
 
+#to see ndvi calculations, again stored in memory
+#write to file if wanting to continue analysis
 head(mad_dec)
-
-
-
-
 
 
 
