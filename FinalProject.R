@@ -12,7 +12,12 @@ library(raster)
 
 #NOAA data from 1/1/2001 to 12/31/2021 of flash floods
 #in Grand County, Utah
-NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/storm_data_search_results.csv")
+
+#path for mac
+#NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/storm_data_search_results.csv")
+
+#path for PC
+NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\storm_data_search_results.csv")
 
 ###HISTOGRAM###
 
@@ -31,7 +36,12 @@ ggplot(data=NOAAFlashFlood,
 ###LAND COVER PLOT###
 
 #Read in Grand County TGER/Line Shape file, 2024
-Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
+
+#path for mac
+#Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
+
+#path for PC
+Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 #Use tigris to read in Grand County Shape file, simple 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
@@ -41,7 +51,13 @@ Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
 grand_vect<-vect(Grand_County_Tigris)
 
 #read in land cover data (NLCD), 2016
-nlcd_2016<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2016_CU_C1V1/Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+
+#path for mac
+#nlcd_2016<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2016_CU_C1V1/Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+
+#path for PC
+nlcd_2016<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2016_CU_C1V1\\Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_2016))
 
