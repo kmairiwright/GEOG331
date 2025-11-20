@@ -10,14 +10,14 @@ library(ggplot2)
 library(tigris)
 library(raster) 
 
-#NOAA data from 1/1/2001 to 12/31/2021 of flash floods
+#All NOAA data available (1997-2024)
 #in Grand County, Utah
 
 #path for mac
-#NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/storm_data_search_results.csv")
+#NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
 
 #path for PC
-NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\storm_data_search_results.csv")
+NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
 
 ###HISTOGRAM###
 
@@ -74,8 +74,8 @@ nlcd_labels <- c(
   "Pasture/Hay", "Cultivated Crops", "Woody Wetlands", "Emergent Herbaceous Wetlands"
 )
 nlcd_colors <- c(
-  "#476BA1", "#D1DEF8", "#DECACA", "#D89382", "#ED0000", "#AA0000", "#B2ADA3",
-  "#68AB5F", "#1C5F2C", "#B5CA8F", "#A3CC51", "#DCD939", "#D1D182", "#A3A3A3",
+  "#476BA1", "#faf8f2", "#DECACA", "#D89382", "#ED0000", "#AA0000", "#B2ADA3",
+  "#68AB5F", "#1C5F2C", "#B5CA8F", "#f7dd7c", "#DCD939", "#D1D182", "#917214",
   "#BAD8EA", "#70A3BA"
 )
 
