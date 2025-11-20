@@ -50,19 +50,19 @@ Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
 #vector of tigris data
 grand_vect<-vect(Grand_County_Tigris)
 
-#read in land cover data (NLCD), 2016
+#read in land cover data (NLCD), 2024
 
 #path for mac
 #nlcd_2016<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2016_CU_C1V1/Annual_NLCD_LndCov_2016_CU_C1V1.tif")
 
 #path for PC
-nlcd_2016<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2016_CU_C1V1\\Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #transform coord reference system to match
-grand_vect<-project(grand_vect, crs(nlcd_2016))
+grand_vect<-project(grand_vect, crs(nlcd_2024))
 
 #crop and mask NLCD to Grand County 
-nlcd_cropped<-crop(nlcd_2016, grand_vect)
+nlcd_cropped<-crop(nlcd_2024, grand_vect)
 nlcd_masked<-mask(nlcd_cropped, grand_vect)
 
 #classify NLCD classes with labels and colors
@@ -81,7 +81,7 @@ nlcd_colors <- c(
 
 #Lat/Long coordinates form NOAAFlashFlood
 FFPoints<-vect(NOAAFlashFlood,geom=c("BEGIN_LON","BEGIN_LAT"), crs = "EPSG:4326")
-FFPoints_proj<-project(FFPoints,crs(nlcd_2016))
+FFPoints_proj<-project(FFPoints,crs(nlcd_2024))
 
 #create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
@@ -91,7 +91,42 @@ plot(nlcd_masked,
      col = nlcd_colors, 
      breaks = c(nlcd_classes, 100), 
      legend=FALSE,
-     main = "Grand County, UT NLCD 2016")
+     main = "Grand County, UT NLCD 2024")
+#Plot FF points on NLCD
+points(FFPoints_proj, col="black",pch=16)
+
+
+#plot legend for NLCD
+#remove the margins
+par(mar = c(0, 0, 0, 0))
+plot.new()
+# NLCD legend
+legend("center",
+       legend = c(nlcd_labels, "Flash Flood Start Point"),
+       fill = c(nlcd_colors, rep(NA, 1)),       
+       pch = c(rep(NA, length(nlcd_labels)), 16), 
+       col = c(rep(NA, length(nlcd_labels)), "black"),
+       pt.cex = 1.2, 
+       cex = 0.8,
+       bty = "n")
+
+#plot flash flood points on 1997 NLCD
+nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+#transform coord reference system to match
+grand_vect<-project(grand_vect, crs(nlcd_1997))
+#crop and mask NLCD to Grand County 
+nlcd_cropped97<-crop(nlcd_1997, grand_vect)
+nlcd_masked97<-mask(nlcd_cropped97, grand_vect)
+
+#create a two panel layout for legend to read clearly
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
+
+#plot NLCD of Grand County 1997
+plot(nlcd_masked97, 
+     col = nlcd_colors, 
+     breaks = c(nlcd_classes, 100), 
+     legend=FALSE,
+     main = "Grand County, UT NLCD 1997")
 #Plot FF points on NLCD
 points(FFPoints_proj, col="black",pch=16)
 
