@@ -14,10 +14,10 @@ library(raster)
 #in Grand County, Utah
 
 #path for mac
-#NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
+NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
 
 #path for PC
-NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
+#NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
 
 ###HISTOGRAM###
 
@@ -38,10 +38,10 @@ ggplot(data=NOAAFlashFlood,
 #Read in Grand County TGER/Line Shape file, 2024
 
 #path for mac
-#Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
+Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
 
 #path for PC
-Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
+#Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 #Use tigris to read in Grand County Shape file, simple 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
@@ -53,10 +53,10 @@ grand_vect<-vect(Grand_County_Tigris)
 #read in land cover data (NLCD), 2024
 
 #path for mac
-#nlcd_2016<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2016_CU_C1V1/Annual_NLCD_LndCov_2016_CU_C1V1.tif")
+nlcd_2024<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #path for PC
-nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
+#nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_2024))
@@ -111,7 +111,11 @@ legend("center",
        bty = "n")
 
 #plot flash flood points on 1997 NLCD
-nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+
+#path for mac
+nlcd_1997<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+#path for PC
+#nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_1997))
 #crop and mask NLCD to Grand County 
