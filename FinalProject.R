@@ -87,6 +87,8 @@ FFPoints_proj<-project(FFPoints,crs(nlcd_2024))
 FFPoints_proj$DEATHS_DIRECT<-as.numeric(FFPoints_proj$DEATHS_DIRECT)
 FFPoints_proj$DAMAGE_PROPERTY_NUM<-as.numeric(FFPoints_proj$DAMAGE_PROPERTY_NUM)
 
+###Plot NLCD 2024###
+
 #create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
 
@@ -113,7 +115,8 @@ legend("center",
        cex = 0.8,
        bty = "n")
 
-#plot flash flood points on 1997 NLCD
+
+###plot flash flood points on 1997 NLCD###
 
 #path for mac
 #nlcd_1997<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
@@ -154,6 +157,9 @@ legend("center",
 #create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
 
+
+###Plot, on NLCD 2024, deaths and property damage###
+
 #plot NLCD of Grand County 2024
 plot(nlcd_masked, 
      col = nlcd_colors, 
@@ -178,4 +184,8 @@ legend("center",
        pt.cex = 1.2, 
        cex = 0.8,
        bty = "n")
+
+#Notes/to do: create plot of years/months with property damage flash floods
+#create plots that looks at whether higher levels of property damage, deaths, 
+#and frequent flash floods are spatially correlated
 
