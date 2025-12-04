@@ -14,10 +14,10 @@ library(raster)
 #in Grand County, Utah
 
 #path for mac
-NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
+#NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
 
 #path for PC
-#NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
+NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
 
 ###HISTOGRAM###
 
@@ -38,10 +38,10 @@ ggplot(data=NOAAFlashFlood,
 #Read in Grand County TGER/Line Shape file, 2024
 
 #path for mac
-Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
+#Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
 
 #path for PC
-#Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
+Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 #Use tigris to read in Grand County Shape file, simple 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
@@ -53,10 +53,10 @@ grand_vect<-vect(Grand_County_Tigris)
 #read in land cover data (NLCD), 2024
 
 #path for mac
-nlcd_2024<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
+#nlcd_2024<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #path for PC
-#nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
+nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_2024))
@@ -83,10 +83,14 @@ nlcd_colors <- c(
 FFPoints<-vect(NOAAFlashFlood,geom=c("BEGIN_LON","BEGIN_LAT"), crs = "EPSG:4326")
 FFPoints_proj<-project(FFPoints,crs(nlcd_2024))
 
+#Change some columns from integer to numeric
+FFPoints_proj$DEATHS_DIRECT<-as.numeric(FFPoints_proj$DEATHS_DIRECT)
+FFPoints_proj$DAMAGE_PROPERTY_NUM<-as.numeric(FFPoints_proj$DAMAGE_PROPERTY_NUM)
+
 #create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
 
-#plot NLCD of Grand County
+#plot NLCD of Grand County 2024
 plot(nlcd_masked, 
      col = nlcd_colors, 
      breaks = c(nlcd_classes, 100), 
@@ -94,7 +98,6 @@ plot(nlcd_masked,
      main = "Grand County, UT NLCD 2024")
 #Plot FF points on NLCD
 points(FFPoints_proj, col="black",pch=16)
-
 
 #plot legend for NLCD
 #remove the margins
@@ -113,9 +116,9 @@ legend("center",
 #plot flash flood points on 1997 NLCD
 
 #path for mac
-nlcd_1997<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+#nlcd_1997<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
 #path for PC
-#nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_1997))
 #crop and mask NLCD to Grand County 
@@ -134,7 +137,6 @@ plot(nlcd_masked97,
 #Plot FF points on NLCD
 points(FFPoints_proj, col="black",pch=16)
 
-
 #plot legend for NLCD
 #remove the margins
 par(mar = c(0, 0, 0, 0))
@@ -148,3 +150,32 @@ legend("center",
        pt.cex = 1.2, 
        cex = 0.8,
        bty = "n")
+
+#create a two panel layout for legend to read clearly
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
+
+#plot NLCD of Grand County 2024
+plot(nlcd_masked, 
+     col = nlcd_colors, 
+     breaks = c(nlcd_classes, 100), 
+     legend=FALSE,
+     main = "Grand County, UT NLCD 2024")
+#Plot FF points on NLCD
+points(FFPoints_proj[FFPoints_proj$DAMAGE_PROPERTY_NUM==0], col="black",pch=16)
+points(FFPoints_proj[FFPoints_proj$DAMAGE_PROPERTY_NUM>=1,FFPoints_proj$DEATHS_DIRECT==0],col="blue",pch=16)
+points(FFPoints_proj[FFPoints_proj$DEATHS_DIRECT>=1], col="#DF00FE",pch=16)
+
+#plot legend for NLCD
+#remove the margins
+par(mar = c(0, 0, 0, 0))
+plot.new()
+# NLCD legend
+legend("center",
+       legend = c(nlcd_labels, "Flash Flood Start Point", "Documented Property Damage", "Deaths"),
+       fill = c(nlcd_colors, rep(NA, 1), rep(NA,1), rep (NA,1)),       
+       pch = c(rep(NA, length(nlcd_labels)), 16, 16, 16), 
+       col = c(rep(NA, length(nlcd_labels)), "black", "blue", "#DF00FE"),
+       pt.cex = 1.2, 
+       cex = 0.8,
+       bty = "n")
+
