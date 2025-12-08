@@ -14,10 +14,10 @@ library(raster)
 #in Grand County, Utah
 
 #path for mac
-#NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
+NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
 
 #path for PC
-NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
+#NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
 
 ###HISTOGRAM###
 
@@ -38,10 +38,10 @@ ggplot(data=NOAAFlashFlood,
 #Read in Grand County TGER/Line Shape file, 2024
 
 #path for mac
-#Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
+Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
 
 #path for PC
-Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
+#Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
 
 #Use tigris to read in Grand County Shape file, simple 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
@@ -53,10 +53,10 @@ grand_vect<-vect(Grand_County_Tigris)
 #read in land cover data (NLCD), 2024
 
 #path for mac
-#nlcd_2024<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
+nlcd_2024<-rast("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #path for PC
-nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
+#nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_2024))
@@ -119,9 +119,9 @@ legend("center",
 ###plot flash flood points on 1997 NLCD###
 
 #path for mac
-#nlcd_1997<-rast("/Volumes/class/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+nlcd_1997<-rast("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
 #path for PC
-nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
+#nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
 #transform coord reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_1997))
 #crop and mask NLCD to Grand County 
@@ -184,6 +184,41 @@ legend("center",
        pt.cex = 1.2, 
        cex = 0.8,
        bty = "n")
+
+###Plot property damage over time###
+
+#create month column, number and name
+NOAAFlashFlood$Months<-as.integer(format(as.Date(NOAAFlashFlood$BEGIN_DATE),"%m"))
+NOAAFlashFlood$Month_Name<-months(as.Date(NOAAFlashFlood$BEGIN_DATE))
+#create year column
+NOAAFlashFlood$Year<-as.integer(format(as.Date(NOAAFlashFlood$BEGIN_DATE), "%Y"))
+
+#plot property damage by year
+ggplot(NOAAFlashFlood, aes(x=Year,y=DAMAGE_PROPERTY_NUM/1e5)) +
+  geom_col(fill="blue4") +
+  labs(title="Total Property Damage by Year",
+       x="Year", y="Property Damage (hundreds of thousands $)") +
+  theme_minimal()
+
+#create new dataframe to look at aggregate damage per month
+damage_by_month<-aggregate(DAMAGE_PROPERTY_NUM~Month_Name,
+                                          data=NOAAFlashFlood,
+                                          FUN=sum,na.rm=TRUE)
+month_order<-month.name
+damage_by_month$Month_Name<-factor(damage_by_month$Month_Name,
+                                   levels=month_order)
+damage_by_month<-damage_by_month[order(damage_by_month$Month_Name),]
+
+ggplot(damage_by_month, aes(x=Month_Name,y=DAMAGE_PROPERTY_NUM/1e5))+
+  geom_col(fill="darkred")+
+    labs(title = "Flash Flood Property Damage by Month (1997-2024)",
+         x="Month",
+         y="Total Property Damage (hundreds of thousands $)")+
+    theme_minimal()+
+    theme(axis.text.x=element_text(angle=45,hjust=1))
+
+
+
 
 #Notes/to do: create plot of years/months with property damage flash floods
 #create plots that looks at whether higher levels of property damage, deaths, 
