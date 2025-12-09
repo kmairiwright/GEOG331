@@ -1,4 +1,5 @@
 #Final Project Script#
+#SCRIPT FOR FINAL PROJECT WITH NLCD DATA
 #KW 10/24/25-
 
 rm(list=ls())
@@ -18,20 +19,6 @@ NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFe
 
 #path for PC
 #NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
-
-###HISTOGRAM###
-
-#create histogram of flash flood reports, monthly
-NOAAFlashFlood$BEGIN_DATE<-as.Date(NOAAFlashFlood$BEGIN_DATE,format="%m/%d/%Y")
-
-ggplot(data=NOAAFlashFlood,
-       aes(x=BEGIN_DATE))+
-  geom_histogram(binwidth=30, fill="darkblue")+
-  labs(title="Grand County Flash Flood Reports (1997-2024), Monthly",
-       x="Date",
-       y="Count")
-
-
 
 ###LAND COVER PLOT###
 
@@ -184,41 +171,6 @@ legend("center",
        pt.cex = 1.2, 
        cex = 0.8,
        bty = "n")
-
-###Plot property damage over time###
-
-#create month column, number and name
-NOAAFlashFlood$Months<-as.integer(format(as.Date(NOAAFlashFlood$BEGIN_DATE),"%m"))
-NOAAFlashFlood$Month_Name<-months(as.Date(NOAAFlashFlood$BEGIN_DATE))
-#create year column
-NOAAFlashFlood$Year<-as.integer(format(as.Date(NOAAFlashFlood$BEGIN_DATE), "%Y"))
-
-#plot property damage by year
-ggplot(NOAAFlashFlood, aes(x=Year,y=DAMAGE_PROPERTY_NUM/1e5)) +
-  geom_col(fill="blue4") +
-  labs(title="Total Property Damage by Year",
-       x="Year", y="Property Damage (hundreds of thousands $)") +
-  theme_minimal()
-
-#create new dataframe to look at aggregate damage per month
-damage_by_month<-aggregate(DAMAGE_PROPERTY_NUM~Month_Name,
-                                          data=NOAAFlashFlood,
-                                          FUN=sum,na.rm=TRUE)
-month_order<-month.name
-damage_by_month$Month_Name<-factor(damage_by_month$Month_Name,
-                                   levels=month_order)
-damage_by_month<-damage_by_month[order(damage_by_month$Month_Name),]
-
-ggplot(damage_by_month, aes(x=Month_Name,y=DAMAGE_PROPERTY_NUM/1e5))+
-  geom_col(fill="darkred")+
-    labs(title = "Flash Flood Property Damage by Month (1997-2024)",
-         x="Month",
-         y="Total Property Damage (hundreds of thousands $)")+
-    theme_minimal()+
-    theme(axis.text.x=element_text(angle=45,hjust=1))
-
-
-
 
 #Notes/to do: create plot of years/months with property damage flash floods
 #create plots that looks at whether higher levels of property damage, deaths, 
