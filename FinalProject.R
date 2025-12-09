@@ -172,7 +172,65 @@ legend("center",
        cex = 0.8,
        bty = "n")
 
-#Notes/to do: create plot of years/months with property damage flash floods
+#create map showing "severe" floods? top 25% prop. damage
+plot.new()
+damage_threshold <- quantile(FFPoints_proj$DAMAGE_PROPERTY_NUM, 0.75, na.rm = TRUE)
+severe_floods <- FFPoints_proj[FFPoints_proj$DAMAGE_PROPERTY_NUM >= damage_threshold, ]
+
+plot(nlcd_masked,
+     col = nlcd_colors,
+     breaks = c(nlcd_classes, 100),
+     legend = FALSE,
+     main = "Severe Flash Floods 1997-2024 over NLCD 2024, Grand County, UT")
+points(severe_floods, col = "black", pch = 16)
+
+
 #create plots that looks at whether higher levels of property damage, deaths, 
 #and frequent flash floods are spatially correlated
+
+FFPoints_proj$NLCD_CLASS<-extract(nlcd_cropped,FFPoints_proj, method="near")[,1]
+FFPoints_proj$NLCD_CLASS<-as.integer(round(FFPoints_proj$NLCD_CLASS))
+
+library(dplyr)
+# Then map to labels
+lc_summary <- FFPoints_proj %>%
+  as.data.frame() %>%
+  group_by(NLCD_CLASS) %>%
+  summarize(Count = n())
+
+lc_summary$Land_Cover <- nlcd_labels[match(lc_summary$NLCD_CLASS, nlcd_classes)]
+
+# Bar plot
+ggplot(lc_summary, aes(x=reorder(Land_Cover, -Count), y=Count, fill=Land_Cover)) +
+  geom_col() +
+  labs(title="Flash Flood Start Points by Land Cover (2024 NLCD)",
+       x="Land Cover", y="Number of Flash Floods") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1)) +
+  guides(fill=FALSE)
+
+damage_lc <- FFPoints_proj %>%
+  as.data.frame() %>%
+  group_by(NLCD_CLASS) %>%
+  summarize(Total_Damage = sum(DAMAGE_PROPERTY_NUM, na.rm=TRUE))
+
+damage_lc$Land_Cover <- nlcd_labels[match(damage_lc$NLCD_CLASS, nlcd_classes)]
+
+ggplot(damage_lc, aes(x=reorder(Land_Cover, -Total_Damage), y=Total_Damage/1e5, fill=Land_Cover)) +
+  geom_col() +
+  labs(title="Total Property Damage by Land Cover",
+       x="Land Cover", y="Total Property Damage (hundreds of thousands $)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1)) +
+  guides(fill=FALSE)
+
+
+
+
+
+
+
+
+
+
 
