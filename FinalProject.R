@@ -264,15 +264,7 @@ compare_df$percent_area   <- round(compare_df$percent_area, 2)
 compare_df$percent_floods <- round(compare_df$percent_floods, 2) 
 compare_df$ratio          <- round(compare_df$ratio, 2)          
 
-#maybe a different plot? 
-ggplot(compare_df, aes(x=label)) +
-  geom_bar(aes(y=percent_area), stat="identity", fill="lightgreen", alpha=0.7) +
-  geom_bar(aes(y=percent_floods), stat="identity", fill="steelblue", alpha=0.7) +
-  labs(title="Landcover Area vs Flood Frequency (2024, Grand County, UT)",
-       x="Landcover Class", y="Percent") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle=45, hjust=1))
-
+#plot from ratio
 ggplot(compare_df, aes(x=label, y=ratio)) +
   geom_bar(stat="identity", fill="purple", alpha=0.7) +
   labs(title="Floods Relative to Landcover Availability (2024)",
@@ -281,17 +273,17 @@ ggplot(compare_df, aes(x=label, y=ratio)) +
   theme(axis.text.x = element_text(angle=45, hjust=1),
         plot.title = element_text(size=14, face="bold"))
 
-#side by side plot?
+#side by side plot
 plot_df <- compare_df %>%
   pivot_longer(cols = c(percent_area, percent_floods),
                names_to = "type", values_to = "percent")
 
-# 3. Rename type labels for clarity
+#clarify
 plot_df$type <- recode(plot_df$type,
                        percent_area   = "Area %",
                        percent_floods = "Flood %")
 
-# 4. Side‑by‑side bar chart
+#side by side bar chart
 ggplot(plot_df, aes(x = label, y = percent, fill = type)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
   labs(title = "Landcover Area vs Flood Frequency (2024, Grand County, UT)",
