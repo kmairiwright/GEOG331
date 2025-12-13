@@ -174,38 +174,33 @@ points(severe_floods, col = "black", pch = 16)
 
 ### WORKING ON ATTACHING LAND CLASS ###
 
-# Force NLCD raster to be numeric
+#force NLCD raster to be numeric
 nlcd_2024_num <- classify(nlcd_2024, rcl = cbind(nlcd_classes, nlcd_classes))
-
-# Crop to county
 nlcd_cropped <- crop(nlcd_2024_num, grand_vect)
 
-# Extract numeric values
+#extract numeric values
 vals_2024 <- terra::extract(nlcd_cropped, FFPoints_proj, nearest=TRUE)
 
-# Attach codes
+#attach NLCD codes
 FFPoints_proj$NLCD_2024 <- vals_2024[,2]
 
-# Map to labels
+#labels
 nlcd_lookup <- data.frame(code = nlcd_classes, label = nlcd_labels)
 FFPoints_proj$NLCD_2024_label <- nlcd_lookup$label[
   match(FFPoints_proj$NLCD_2024, nlcd_lookup$code)
 ]
 
-plot(nlcd_cropped)
-points(FFPoints_proj, col="red", pch=16)
-
+#extract to FF points
 terra::extract(nlcd_cropped, FFPoints_proj[1,], nearest=TRUE)
 
-head(FFPoints_proj)
-
-# Convert flood points to a data frame for ggplot
+#convert flood points to a df for plotting
 ff_df <- as.data.frame(FFPoints_proj)
 
-# Make sure damage is numeric
 ff_df$DAMAGE_PROPERTY_NUM <- as.numeric(ff_df$DAMAGE_PROPERTY_NUM)
 
-# Box plot: property damage by NLCD class (2024)
+### some summary plots on above data ###
+
+#box plot, property damage by NLCD class
 ggplot(ff_df, aes(x = NLCD_2024_label, y = DAMAGE_PROPERTY_NUM)) +
   geom_boxplot(fill = "skyblue", color = "darkblue", outlier.shape = 16, outlier.colour = "red") +
   scale_y_log10(labels = scales::comma) +   # log scale for skewed damage values
@@ -220,6 +215,7 @@ ggplot(ff_df, aes(x = NLCD_2024_label, y = DAMAGE_PROPERTY_NUM)) +
     plot.title = element_text(size = 14, face = "bold")
   )
 
+#bar graph of FF count
 ggplot(ff_df, aes(x = NLCD_2024_label)) +
   geom_bar(fill = "steelblue") +
   labs(title = "Number of Flash Floods by Landcover Class (2024)",
@@ -227,15 +223,54 @@ ggplot(ff_df, aes(x = NLCD_2024_label)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+### Look at Propotion of Land Cover Class to frequency of flooding? ###
 
+#raw cell values from the cropped raster
+vals <- terra::values(nlcd_cropped)
+vals <- vals[!is.na(vals)]
 
+#frequency of each NLCD code
+lc_counts <- as.data.frame(table(vals))
+colnames(lc_counts) <- c("code","count")
 
+lc_counts$code <- as.numeric(as.character(lc_counts$code))
 
+lc_counts$label <- nlcd_lookup$label[match(lc_counts$code, nlcd_lookup$code)]
 
+#percent area
+lc_counts$percent_area <- (lc_counts$count / sum(lc_counts$count)) * 100
 
+#flood counts by landcover
+flood_counts <- table(FFPoints_proj$NLCD_2024_label)
+flood_df <- as.data.frame(flood_counts)
+colnames(flood_df) <- c("label","count")
+flood_df$percent_floods <- (flood_df$count / sum(flood_df$count)) * 100
 
+#compare landcover area with flood counts
+compare_df <- merge(lc_counts[,c("label","percent_area")],
+                    flood_df[,c("label","percent_floods")],
+                    by="label", all=TRUE)
 
+#calculate ratio (% floods/ % area)
+compare_df$ratio <- compare_df$percent_floods / compare_df$percent_area
 
+#replace NAs with 0
+compare_df$percent_floods[is.na(compare_df$percent_floods)] <- 0
+compare_df$ratio[is.na(compare_df$ratio)] <- 0
+
+#round values two decimals to make compare_df table easier to reaf
+compare_df$percent_area   <- round(compare_df$percent_area, 2)
+compare_df$percent_floods <- round(compare_df$percent_floods, 2) 
+compare_df$ratio          <- round(compare_df$ratio, 2)          
+
+#maybe a different plot? 
+ggplot(compare_df, aes(x=label)) +
+  geom_bar(aes(y=percent_area), stat="identity", fill="lightgreen", alpha=0.7) +
+  geom_bar(aes(y=percent_floods), stat="identity", fill="steelblue", alpha=0.7) +
+  labs(title="Landcover Area vs Flood Frequency (2024, Grand County, UT)",
+       x="Landcover Class", y="Percent") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1))
 
 
 
