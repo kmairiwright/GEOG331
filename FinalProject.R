@@ -9,6 +9,7 @@ library(tidyterra)
 library(FedData)
 library(ggplot2)
 library(tigris)
+library(dplyr)
  
 #All NOAA data available (1997-2024) in Grand County, Utah
 
@@ -272,6 +273,30 @@ ggplot(compare_df, aes(x=label)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle=45, hjust=1))
 
+ggplot(compare_df, aes(x=label, y=ratio)) +
+  geom_bar(stat="identity", fill="purple", alpha=0.7) +
+  labs(title="Floods Relative to Landcover Availability (2024)",
+       x="Landcover Class", y="Floods % ÷ Area %") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1),
+        plot.title = element_text(size=14, face="bold"))
 
+#side by side plot?
+plot_df <- compare_df %>%
+  pivot_longer(cols = c(percent_area, percent_floods),
+               names_to = "type", values_to = "percent")
 
+# 3. Rename type labels for clarity
+plot_df$type <- recode(plot_df$type,
+                       percent_area   = "Area %",
+                       percent_floods = "Flood %")
 
+# 4. Side‑by‑side bar chart
+ggplot(plot_df, aes(x = label, y = percent, fill = type)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  labs(title = "Landcover Area vs Flood Frequency (2024, Grand County, UT)",
+       x = "Landcover Class", y = "Percent") +
+  scale_fill_manual(values = c("Area %" = "lightgreen", "Flood %" = "steelblue")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 14, face = "bold"))
