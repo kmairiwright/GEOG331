@@ -9,28 +9,17 @@ library(tidyterra)
 library(FedData)
 library(ggplot2)
 library(tigris)
-library(raster) 
-
-#All NOAA data available (1997-2024)
-#in Grand County, Utah
+ 
+#All NOAA data available (1997-2024) in Grand County, Utah
 
 #path for mac
 NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
-
 #path for PC
 #NOAAFlashFlood<-read.csv("Z:\\kmwright\\data\\Project_Data\\allFFeventsGrand.csv")
 
-###LAND COVER PLOT###
+###LAND COVER PLOTS###
 
-#Read in Grand County TGER/Line Shape file, 2024
-
-#path for mac
-Grand_County_UT<-vect("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Grand_County")
-
-#path for PC
-#Grand_County_UT<-vect("Z:\\kmwright\\data\\Project_Data\\Grand_County")
-
-#Use tigris to read in Grand County Shape file, simple 
+#Use tigris for Grand County Shape file, simple 
 Grand_County_Tigris<-counties(state="UT",cb=TRUE) %>%
   filter(NAME=="Grand")
 
@@ -41,11 +30,10 @@ grand_vect<-vect(Grand_County_Tigris)
 
 #path for mac
 nlcd_2024<-rast("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
-
 #path for PC
 #nlcd_2024<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_2024_CU_C1V1_mi7m3sagei6es9.tiff")
 
-#transform coord reference system to match
+#transform coordinate reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_2024))
 
 #crop and mask NLCD to Grand County 
@@ -78,7 +66,6 @@ FFPoints_proj$DAMAGE_PROPERTY_NUM<-as.numeric(FFPoints_proj$DAMAGE_PROPERTY_NUM)
 
 #create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
-
 #plot NLCD of Grand County 2024
 plot(nlcd_masked, 
      col = nlcd_colors, 
@@ -109,7 +96,8 @@ legend("center",
 nlcd_1997<-rast("/Volumes/GEOG331_F25/kmwright/data/Project_Data/Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
 #path for PC
 #nlcd_1997<-rast("Z:\\kmwright\\data\\Project_Data\\Annual_NLCD_LndCov_1997_CU_C1V1_mi7m3sagei6es9.tiff")
-#transform coord reference system to match
+
+#transform coordinate reference system to match
 grand_vect<-project(grand_vect, crs(nlcd_1997))
 #crop and mask NLCD to Grand County 
 nlcd_cropped97<-crop(nlcd_1997, grand_vect)
@@ -144,7 +132,6 @@ legend("center",
 #create a two panel layout for legend to read clearly
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 1)) 
 
-
 ###Plot, on NLCD 2024, deaths and property damage###
 
 #plot NLCD of Grand County 2024
@@ -153,6 +140,7 @@ plot(nlcd_masked,
      breaks = c(nlcd_classes, 100), 
      legend=FALSE,
      main = "Grand County, UT NLCD 2024")
+
 #Plot FF points on NLCD
 points(FFPoints_proj[FFPoints_proj$DAMAGE_PROPERTY_NUM==0], col="black",pch=16)
 points(FFPoints_proj[FFPoints_proj$DAMAGE_PROPERTY_NUM>=1,FFPoints_proj$DEATHS_DIRECT==0],col="blue",pch=16)
@@ -184,45 +172,63 @@ plot(nlcd_masked,
      main = "Severe Flash Floods 1997-2024 over NLCD 2024, Grand County, UT")
 points(severe_floods, col = "black", pch = 16)
 
+### WORKING ON ATTACHING LAND CLASS ###
 
-#create plots that looks at whether higher levels of property damage, deaths, 
-#and frequent flash floods are spatially correlated
+# Force NLCD raster to be numeric
+nlcd_2024_num <- classify(nlcd_2024, rcl = cbind(nlcd_classes, nlcd_classes))
 
-FFPoints_proj$NLCD_CLASS<-extract(nlcd_cropped,FFPoints_proj, method="near")[,1]
-FFPoints_proj$NLCD_CLASS<-as.integer(round(FFPoints_proj$NLCD_CLASS))
+# Crop to county
+nlcd_cropped <- crop(nlcd_2024_num, grand_vect)
 
-library(dplyr)
-# Then map to labels
-lc_summary <- FFPoints_proj %>%
-  as.data.frame() %>%
-  group_by(NLCD_CLASS) %>%
-  summarize(Count = n())
+# Extract numeric values
+vals_2024 <- terra::extract(nlcd_cropped, FFPoints_proj, nearest=TRUE)
 
-lc_summary$Land_Cover <- nlcd_labels[match(lc_summary$NLCD_CLASS, nlcd_classes)]
+# Attach codes
+FFPoints_proj$NLCD_2024 <- vals_2024[,2]
 
-# Bar plot
-ggplot(lc_summary, aes(x=reorder(Land_Cover, -Count), y=Count, fill=Land_Cover)) +
-  geom_col() +
-  labs(title="Flash Flood Start Points by Land Cover (2024 NLCD)",
-       x="Land Cover", y="Number of Flash Floods") +
+# Map to labels
+nlcd_lookup <- data.frame(code = nlcd_classes, label = nlcd_labels)
+FFPoints_proj$NLCD_2024_label <- nlcd_lookup$label[
+  match(FFPoints_proj$NLCD_2024, nlcd_lookup$code)
+]
+
+plot(nlcd_cropped)
+points(FFPoints_proj, col="red", pch=16)
+
+terra::extract(nlcd_cropped, FFPoints_proj[1,], nearest=TRUE)
+
+head(FFPoints_proj)
+
+# Convert flood points to a data frame for ggplot
+ff_df <- as.data.frame(FFPoints_proj)
+
+# Make sure damage is numeric
+ff_df$DAMAGE_PROPERTY_NUM <- as.numeric(ff_df$DAMAGE_PROPERTY_NUM)
+
+# Box plot: property damage by NLCD class (2024)
+ggplot(ff_df, aes(x = NLCD_2024_label, y = DAMAGE_PROPERTY_NUM)) +
+  geom_boxplot(fill = "skyblue", color = "darkblue", outlier.shape = 16, outlier.colour = "red") +
+  scale_y_log10(labels = scales::comma) +   # log scale for skewed damage values
+  labs(
+    title = "Flash Flood Property Damage by Landcover Class (2024, Grand County, UT)",
+    x = "NLCD 2024 Landcover Class",
+    y = "Property Damage ($, log scale)"
+  ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle=45, hjust=1)) +
-  guides(fill=FALSE)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(size = 14, face = "bold")
+  )
 
-damage_lc <- FFPoints_proj %>%
-  as.data.frame() %>%
-  group_by(NLCD_CLASS) %>%
-  summarize(Total_Damage = sum(DAMAGE_PROPERTY_NUM, na.rm=TRUE))
-
-damage_lc$Land_Cover <- nlcd_labels[match(damage_lc$NLCD_CLASS, nlcd_classes)]
-
-ggplot(damage_lc, aes(x=reorder(Land_Cover, -Total_Damage), y=Total_Damage/1e5, fill=Land_Cover)) +
-  geom_col() +
-  labs(title="Total Property Damage by Land Cover",
-       x="Land Cover", y="Total Property Damage (hundreds of thousands $)") +
+ggplot(ff_df, aes(x = NLCD_2024_label)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Number of Flash Floods by Landcover Class (2024)",
+       x = "Landcover Class", y = "Flood Count") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle=45, hjust=1)) +
-  guides(fill=FALSE)
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
 
 
 
