@@ -1,6 +1,6 @@
 #Final Project Script#
 #SCRIPT FOR FINAL PROJECT WITH NLCD DATA
-#KW 10/24/25-
+#KW 10/24/25-12/15/25
 
 rm(list=ls())
 
@@ -12,7 +12,6 @@ library(tigris)
 library(dplyr)
  
 #All NOAA data available (1997-2024) in Grand County, Utah
-
 #path for mac
 NOAAFlashFlood<-read.csv("/Volumes/GEOG331_F25/kmwright/data/Project_Data/allFFeventsGrand.csv")
 #path for PC
@@ -58,10 +57,6 @@ nlcd_colors <- c(
 #Lat/Long coordinates form NOAAFlashFlood
 FFPoints<-vect(NOAAFlashFlood,geom=c("BEGIN_LON","BEGIN_LAT"), crs = "EPSG:4326")
 FFPoints_proj<-project(FFPoints,crs(nlcd_2024))
-
-#Change some columns from integer to numeric
-FFPoints_proj$DEATHS_DIRECT<-as.numeric(FFPoints_proj$DEATHS_DIRECT)
-FFPoints_proj$DAMAGE_PROPERTY_NUM<-as.numeric(FFPoints_proj$DAMAGE_PROPERTY_NUM)
 
 ###Plot NLCD 2024###
 
@@ -175,7 +170,7 @@ points(severe_floods, col = "black", pch = 16)
 
 ### WORKING ON ATTACHING LAND CLASS ###
 
-#force NLCD raster to be numeric
+#force NLCD raster to be numeric (instead of categorical)
 nlcd_2024_num <- classify(nlcd_2024, rcl = cbind(nlcd_classes, nlcd_classes))
 nlcd_cropped <- crop(nlcd_2024_num, grand_vect)
 
@@ -199,14 +194,14 @@ ff_df <- as.data.frame(FFPoints_proj)
 
 ff_df$DAMAGE_PROPERTY_NUM <- as.numeric(ff_df$DAMAGE_PROPERTY_NUM)
 
-### some summary plots on above data ###
+###summary plots on above data###
 
 #box plot, property damage by NLCD class
 ggplot(ff_df, aes(x = NLCD_2024_label, y = DAMAGE_PROPERTY_NUM)) +
-  geom_boxplot(fill = "skyblue", color = "darkblue", outlier.shape = 16, outlier.colour = "red") +
+  geom_boxplot(fill = "lightblue", color = "darkblue", outlier.shape = 16, outlier.colour = "red") +
   scale_y_log10(labels = scales::comma) +   # log scale for skewed damage values
   labs(
-    title = "Flash Flood Property Damage by Landcover Class (2024, Grand County, UT)",
+    title = "Flash Flood Property Damage by Landcover Class",
     x = "NLCD 2024 Landcover Class",
     y = "Property Damage ($, log scale)"
   ) +
@@ -218,13 +213,13 @@ ggplot(ff_df, aes(x = NLCD_2024_label, y = DAMAGE_PROPERTY_NUM)) +
 
 #bar graph of FF count
 ggplot(ff_df, aes(x = NLCD_2024_label)) +
-  geom_bar(fill = "steelblue") +
-  labs(title = "Number of Flash Floods by Landcover Class (2024)",
-       x = "Landcover Class", y = "Flood Count") +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Number of Flash Floods by Landcover Class",
+       x = "NLCD 2024 Landcover Class", y = "Flood Count") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-### Look at Propotion of Land Cover Class to frequency of flooding? ###
+###Look at proportion of Land Cover Class to frequency of flooding###
 
 #raw cell values from the cropped raster
 vals <- terra::values(nlcd_cropped)
@@ -266,9 +261,9 @@ compare_df$ratio          <- round(compare_df$ratio, 2)
 
 #plot from ratio
 ggplot(compare_df, aes(x=label, y=ratio)) +
-  geom_bar(stat="identity", fill="purple", alpha=0.7) +
-  labs(title="Floods Relative to Landcover Availability (2024)",
-       x="Landcover Class", y="Floods % ÷ Area %") +
+  geom_bar(stat="identity", fill="purple3") +
+  labs(title="Floods Relative to Landcover Availability",
+       x="Landcover Class", y="Flood to Landcover Ratio (% Floods ÷ % Area") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle=45, hjust=1),
         plot.title = element_text(size=14, face="bold"))
@@ -286,9 +281,9 @@ plot_df$type <- recode(plot_df$type,
 #side by side bar chart
 ggplot(plot_df, aes(x = label, y = percent, fill = type)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
-  labs(title = "Landcover Area vs Flood Frequency (2024, Grand County, UT)",
+  labs(title = "Landcover Area vs Flood Frequency",
        x = "Landcover Class", y = "Percent") +
-  scale_fill_manual(values = c("Area %" = "lightgreen", "Flood %" = "steelblue")) +
+  scale_fill_manual(values = c("Area %" = "indianred2", "Flood %" = "lightblue")) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(size = 14, face = "bold"))
