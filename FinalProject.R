@@ -263,7 +263,7 @@ compare_df$ratio          <- round(compare_df$ratio, 2)
 ggplot(compare_df, aes(x=label, y=ratio)) +
   geom_bar(stat="identity", fill="purple3") +
   labs(title="Floods Relative to Landcover Availability",
-       x="Landcover Class", y="Flood to Landcover Ratio (% Floods ÷ % Area") +
+       x="Landcover Class", y="Flood to Landcover Ratio (% Floods ÷ % Area)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle=45, hjust=1),
         plot.title = element_text(size=14, face="bold"))
