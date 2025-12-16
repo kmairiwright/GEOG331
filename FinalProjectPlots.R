@@ -100,7 +100,7 @@ ggplot(NOAAFlashFlood, aes(x = DAMAGE_PROPERTY_NUM/1e6, y = DEATHS_DIRECT)) +
        x="Property Damage (millions)", y="Deaths") +
   theme_minimal()
 
-#dual axis plot
+###dual axis plot###
 
 monthly_summary <- NOAAFlashFlood %>%
   group_by(Month_Name) %>%
@@ -109,9 +109,9 @@ monthly_summary <- NOAAFlashFlood %>%
     Total_Damage = sum(DAMAGE_PROPERTY_NUM, na.rm = TRUE)
   )
 
-# Dual-axis plot (secondary y-axis for damage)
+#dual-axis plot (secondary y-axis for damage)
 NOAAFlashFlood$Month_Name <- factor(NOAAFlashFlood$Month_Name,
-                                    levels = month.name,  # Jan, Feb, ..., Dec
+                                    levels = month.name,
                                     ordered = TRUE)
 
 monthly_summary <- NOAAFlashFlood %>%
@@ -121,7 +121,7 @@ monthly_summary <- NOAAFlashFlood %>%
     Total_Damage = sum(DAMAGE_PROPERTY_NUM, na.rm = TRUE)
   )
 
-#Dual-axis plot (secondary y-axis for damage)
+#dual-axis plot (secondary y-axis for damage)
 ggplot(monthly_summary, aes(x = Month_Name)) +
   geom_col(aes(y = Flood_Count), fill = "lightblue") +
   geom_line(aes(y = Total_Damage / 1e6), group = 1, color = "red3", linewidth = 1.2) +
